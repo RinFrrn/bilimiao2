@@ -433,7 +433,7 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
         super.onAutoCompletion()
         videoPlayerCallBack?.onAutoCompletion()
         releaseDanmaku()
-        DebugMiao.log("onAutoCompletion")
+//        DebugMiao.log("onAutoCompletion")
     }
 
     override fun onVideoPause() {
@@ -460,7 +460,7 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
     override fun onCompletion() {
         super.onCompletion()
         releaseDanmaku()
-        DebugMiao.log("onCompletion")
+//        DebugMiao.log("onCompletion")
     }
 
     override fun release() {

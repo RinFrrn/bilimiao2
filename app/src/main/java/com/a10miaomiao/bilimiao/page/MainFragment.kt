@@ -35,6 +35,7 @@ import com.a10miaomiao.bilimiao.page.download.DownloadFragment
 import com.a10miaomiao.bilimiao.page.home.*
 import com.a10miaomiao.bilimiao.page.search.SearchStartFragment
 import com.a10miaomiao.bilimiao.page.user.HistoryFragment
+import com.a10miaomiao.bilimiao.page.user.favourite.UserFavouriteListFragment
 import com.a10miaomiao.bilimiao.store.WindowStore
 import com.a10miaomiao.bilimiao.template.SettingFragment
 import com.a10miaomiao.bilimiao.template.TemplateFragment
@@ -110,18 +111,11 @@ class MainFragment : Fragment(), DIAware, MyPage {
                 nav.navigate(HistoryFragment.actionId)
             }
             MenuKeys.favourite -> {
-                val args = bundleOf(
-                    MainNavGraph.args.id to userStore.state.info!!.mid.toString(),
-                    MainNavGraph.args.name to userStore.state.info!!.name
+                val args = UserFavouriteListFragment.createArguments(
+                    userStore.state.info!!.mid.toString(),
+                    userStore.state.info!!.name
                 )
-                nav.navigate(MainNavGraph.action.home_to_userFavouriteList, args)
-            }
-            MenuKeys.favourite -> {
-                val args = bundleOf(
-                    MainNavGraph.args.id to userStore.state.info!!.mid.toString(),
-                    MainNavGraph.args.name to userStore.state.info!!.name
-                )
-                nav.navigate(MainNavGraph.action.home_to_userFavouriteList, args)
+                nav.navigate(UserFavouriteListFragment.actionId, args)
             }
             MenuKeys.download -> {
                 nav.navigate(DownloadFragment.actionId)

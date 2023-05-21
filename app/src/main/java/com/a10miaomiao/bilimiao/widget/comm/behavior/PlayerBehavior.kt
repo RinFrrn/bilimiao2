@@ -17,8 +17,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class PlayerBehavior(context: Context, attrs: AttributeSet?) :
-    CoordinatorLayout.Behavior<View>(context, attrs) {
+class PlayerBehavior : CoordinatorLayout.Behavior<View> {
 
     var playerX = -1
     var playerY = -1
@@ -115,7 +114,7 @@ class PlayerBehavior(context: Context, attrs: AttributeSet?) :
     ) {
         if (parent.showPlayer) {
             var computedHeight = (parent.measuredWidth.toDouble() / 16 * 9).roundToInt()
-            computedHeight = min(computedHeight, (1.5 * contentHeight).roundToInt())
+            computedHeight = min(computedHeight, (1.5 * playerHeight).roundToInt())
             height = computedHeight + child.paddingTop
             //height = playerHeight + child.paddingTop
             width = parent.measuredWidth
