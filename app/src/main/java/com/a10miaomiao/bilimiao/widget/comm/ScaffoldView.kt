@@ -6,6 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.customview.widget.ViewDragHelper
+import androidx.transition.ChangeBounds
+import androidx.transition.TransitionManager
+import com.a10miaomiao.bilimiao.comm.CustomPathInterpolator
 import com.a10miaomiao.bilimiao.widget.comm.behavior.AppBarBehavior
 import com.a10miaomiao.bilimiao.widget.comm.behavior.ContentBehavior
 import com.a10miaomiao.bilimiao.widget.comm.behavior.PlayerBehavior
@@ -46,6 +49,14 @@ class ScaffoldView @JvmOverloads constructor(
         set(value) {
             if (field != value) {
                 field = value
+
+                // 全屏切换动画
+                ChangeBounds().let {
+                    it.duration = 400
+                    it.interpolator = CustomPathInterpolator.SmoothCurve
+                    TransitionManager.beginDelayedTransition(this, it)
+                }
+
                 requestLayout()
                 onPlayerChanged?.invoke(true)
             }
@@ -55,8 +66,8 @@ class ScaffoldView @JvmOverloads constructor(
     var appBarWidth = dip(100)
     var playerHeight = -3
     var playerWidth = -3
-    var _playerHeight = dip(200)
-    var _playerWidth = dip(300)
+//    var _playerHeight = dip(200)
+//    var _playerWidth = dip(300)
 
     var appBar: AppBarView? = null
     var appBarBehavior: AppBarBehavior? = null

@@ -56,9 +56,10 @@ class AppBarBehavior : CoordinatorLayout.Behavior<View> {
         val width = appBarWidth + child.paddingLeft
         if (parent is ScaffoldView) {
             val orientation = parent.orientation
-            if (parent.fullScreenPlayer) {
-                child.layout(0, 0, 0, 0)
-            } else if (orientation == ScaffoldView.HORIZONTAL) {
+//            if (parent.fullScreenPlayer) {
+//                child.layout(0, 0, 0, 0)
+//            } else
+            if (orientation == ScaffoldView.HORIZONTAL) {
                 currentState = STATE_SCROLLED_UP
                 child.translationY = 0f
                 child.layout(0, 0, width, parent.measuredHeight)

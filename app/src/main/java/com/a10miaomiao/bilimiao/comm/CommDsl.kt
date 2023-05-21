@@ -3,6 +3,7 @@ package com.a10miaomiao.bilimiao.comm
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.PathInterpolator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.createViewModelLazy
@@ -137,4 +138,13 @@ inline fun <reified T : BaseStore<*>> MiaoBindingUi.miaoStore(owner: LifecycleOw
     }.store
     connectStore(owner, store)
     return store
+}
+
+object CustomPathInterpolator {
+    // Recommand duration: 400ms
+    val SmoothCurve = PathInterpolator(0.26f, 0.9f, 0.26f, 1.0f)
+    // Recommand duration: 520ms
+    val SheetCurve  = PathInterpolator(0.3f, 0.9f, 0.16f, 1.0f)
+    // Recommand duration: 640ms
+    val PushCurve   = PathInterpolator(0.36f, 0.44f, 0.06f, 1.0f)
 }

@@ -37,8 +37,8 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
     private var currentOrientation = ScaffoldView.VERTICAL
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        playerHeight = context.dip(200)
-        playertWidth = context.dip(300)
+        playerHeight = context.dip(220)
+        playertWidth = context.dip(330)
         minPadding = context.dip(10)
         dragAreaHeight = context.dip(30)
     }
@@ -156,11 +156,13 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
             child.layoutParams.width = width
             child.requestLayout()
         }
-        // 内容区域布局尺寸校正
-        if (parent.playerHeight != height || parent.playerWidth != width) {
-            parent.playerHeight = height
-            parent.playerWidth = width
-            parent.content?.requestLayout()
+        // 内容区域布局尺寸校正(仅非全屏时更新布局)
+        if (scaffoldView.fullScreenPlayer.not()) {
+            if (parent.playerHeight != height || parent.playerWidth != width) {
+                parent.playerHeight = height
+                parent.playerWidth = width
+                parent.content?.requestLayout()
+            }
         }
         // 显示隐藏动画控制
         if (parent.showPlayer && !isShowChild) {

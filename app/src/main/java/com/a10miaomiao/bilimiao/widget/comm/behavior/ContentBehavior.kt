@@ -35,11 +35,11 @@ class ContentBehavior : CoordinatorLayout.Behavior<View> {
             val orientation = parent.orientation
             val playerWidth = parent.playerWidth
             val playerHeight = parent.playerHeight
-            if (parent.fullScreenPlayer) {
-                height = 0
-                width = 0
-                child.layout(0, 0, 0, 0)
-            } else {
+//            if (parent.fullScreenPlayer) {
+//                height = 0
+//                width = 0
+//                child.layout(0, 0, 0, 0)
+//            } else {
                 val left = if (orientation == ScaffoldView.HORIZONTAL) parent.appBarWidth else 0
                 child.layout(left, 0, parent.measuredWidth, parent.measuredHeight)
                 height = parent.measuredHeight
@@ -56,7 +56,7 @@ class ContentBehavior : CoordinatorLayout.Behavior<View> {
                     child.translationY = 0f
                     downHeight = 0
                 }
-            }
+//            }
 
             if (child.layoutParams.height != height || child.layoutParams.width != width) {
                 child.layoutParams.height = height
