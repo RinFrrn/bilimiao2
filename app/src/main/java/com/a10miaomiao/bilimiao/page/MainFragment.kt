@@ -11,7 +11,9 @@ import android.view.ViewGroup
 import android.widget.Space
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -65,6 +67,16 @@ class MainFragment : Fragment(), DIAware, MyPage {
                 }
             },
             myMenuItem {
+                key = MenuKeys.favourite
+                title = "收藏"
+                iconResource = R.drawable.ic_star_outline_gray_24dp
+                visibility = if (userStore.isLogin()) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            },
+            myMenuItem {
                 key = MenuKeys.download
                 title = "下载"
                 iconResource = R.drawable.ic_arrow_downward_gray_24dp
@@ -86,6 +98,13 @@ class MainFragment : Fragment(), DIAware, MyPage {
             }
             MenuKeys.history -> {
                 nav.navigate(MainNavGraph.action.home_to_history)
+            }
+            MenuKeys.favourite -> {
+                val args = bundleOf(
+                    MainNavGraph.args.id to userStore.state.info!!.mid.toString(),
+                    MainNavGraph.args.name to userStore.state.info!!.name
+                )
+                nav.navigate(MainNavGraph.action.home_to_userFavouriteList, args)
             }
             MenuKeys.download -> {
                 nav.navigate(MainNavGraph.action.home_to_download)

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cn.a10miaomiao.miao.binding.android.view.*
 import cn.a10miaomiao.miao.binding.android.widget._text
+import cn.a10miaomiao.miao.binding.android.widget._textColor
 import cn.a10miaomiao.miao.binding.android.widget._textColorResource
 import cn.a10miaomiao.miao.binding.miaoEffect
 import com.a10miaomiao.bilimiao.MainNavGraph
@@ -386,8 +387,8 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
                     verticalPadding = dip(5)
                     textColorResource = R.color.text_black
                     textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-                    maxWidth = dip(120)
-                    minWidth = dip(60)
+                    maxWidth = dip(180)
+                    minWidth = dip(120)
                     maxLines = 1
                     gravity = Gravity.LEFT
                     ellipsize = TextUtils.TruncateAt.END
@@ -407,6 +408,7 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
 
     fun MiaoUI.pageView(): View {
         return horizontalLayout {
+
             views {
                 +frameLayout {
 
@@ -474,8 +476,8 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
                     isCircle = true
                     _network(item.face, "@200w_200h")
                 }..lParams {
-                    height = dip(40)
-                    width = dip(40)
+                    height = dip(36)
+                    width = dip(36)
                 }
 
                 +textView {
@@ -513,8 +515,8 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
                             isCircle = true
                             _network(viewModel.info?.owner?.face, "@200w_200h")
                         }..lParams {
-                            height = dip(40)
-                            width = dip(40)
+                            height = dip(36)
+                            width = dip(36)
                         }
 
                         +verticalLayout {
@@ -574,12 +576,14 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
             views {
                 +frameLayout {
                     apply(ViewStyle.roundRect(dip(5)))
-                    setBackgroundResource(config.selectableItemBackground)
+                    backgroundColor = config.blockBackgroundColor
 
                     views {
                         +textView {
-                            backgroundColor = config.blockBackgroundColor
-                            padding = dip(5)
+                            setBackgroundResource(config.selectableItemBackground)
+//                            backgroundColor = config.blockBackgroundColor
+                            verticalPadding = dip(4)
+                            horizontalPadding = dip(8)
                             _text = item.tag_name
                         }
                     }
@@ -613,16 +617,26 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
         val videoInfo = viewModel.info
         return verticalLayout {
             views {
+
+                // up信息
+                +upperView()..lParams {
+                    width = matchParent
+                    height = wrapContent
+                    topMargin = dip(2)
+                    bottomMargin = dip(8)
+                }
+
+                // 视频标题
                 +horizontalLayout {
                     views {
-                        +rcImageView {
-                            radius = dip(5)
-                            _network(videoInfo?.pic, "@672w_378h_1c_")
-                        }..lParams {
-                            width = dip(150)
-                            height = dip(100)
-                            rightMargin = dip(10)
-                        }
+//                        +rcImageView {
+//                            radius = dip(5)
+//                            _network(videoInfo?.pic, "@672w_378h_1c_")
+//                        }..lParams {
+//                            width = dip(150)
+//                            height = dip(100)
+//                            rightMargin = dip(10)
+//                        }
 
                         +verticalLayout {
 
@@ -634,7 +648,10 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
                                     maxLines = 4
                                     setTextColor(config.foregroundColor)
                                     _text = videoInfo?.title ?: ""
-                                }..lParams(weight = 1f)
+                                }..lParams {
+                                    weight = 1f
+                                    bottomMargin = dip(2)
+                                }
 
                                 // 播放量
                                 +horizontalLayout {
@@ -684,11 +701,13 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
                     }
                 }
 
-                +upperView()..lParams {
-                    width = matchParent
-                    height = wrapContent
-                    topMargin = dip(10)
-                }
+//                +upperView()..lParams {
+//                    width = matchParent
+//                    height = wrapContent
+//                    topMargin = dip(10)
+//                }
+
+                // 分p
                 +pageView()..lParams {
                     width = matchParent
                     height = dip(48)
@@ -696,6 +715,7 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
                 }
 
                 +expandableTextView {
+                    setTextColor(config.foregroundAlpha66Color)
                     setLineSpacing(dip(4).toFloat(), 1.0f)
                     textSize = 14f
                     setMaxLine(2)
@@ -715,7 +735,7 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
                 +tagsView()..lParams {
                     width = matchParent
                     height = wrapContent
-                    topMargin = dip(10)
+                    topMargin = dip(16)
                 }
             }
 
@@ -740,6 +760,16 @@ class VideoInfoFragment: Fragment(), DIAware, MyPage {
         // 监听info改变，修改页面标题
         miaoEffect(listOf(info, info?.req_user, info?.staff)) {
             pageConfig.notifyConfigChanged()
+        }
+        // 自动播放
+        miaoEffect(info?.pages) { pages ->
+            if (pages.isNullOrEmpty().not()) {
+                val cids = pages!!.map { it.cid }
+                if (cids.contains(playerStore.state.cid).not()) {
+                    val item = pages.first()
+                    playVideo(item.cid, item.part)
+                }
+            }
         }
         recyclerView {
             _leftPadding = contentInsets.left

@@ -13,7 +13,8 @@ object Versions {
     const val navigation = "2.5.3"
     const val compose = "1.3.3"
     const val media = "1.6.0"
-    const val media3 = "1.0.0-rc01"
+//    const val media3 = "1.0.0-rc01"
+    const val media3 = "1.0.1"
 
     const val accompanist = "0.29.2-rc"
 

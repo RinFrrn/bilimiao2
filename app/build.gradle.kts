@@ -123,7 +123,7 @@ dependencies {
     implementation(Libraries.media3ExoPlayer)
     implementation(Libraries.media3ExoPlayerDash)
     implementation(Libraries.gsyVideoPlayer)
-    implementation(files("libs/lib-decoder-av1-release.aar"))
+//    implementation(files("libs/lib-decoder-av1-release.aar"))
 
     implementation(Libraries.gson)
     implementation(Libraries.okhttp3)

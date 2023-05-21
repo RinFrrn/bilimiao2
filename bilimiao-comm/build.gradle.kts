@@ -46,11 +46,13 @@ android {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.12.0"  // 相当于proto编译器
+//        artifact = "com.google.protobuf:protoc:3.12.0"  // 相当于proto编译器
+        artifact = "com.google.protobuf:protoc:3.12.0:osx-x86_64"  // 相当于proto编译器(arm mac 需要指定平台)
     }
     plugins {
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.33.0" // Grpc单独的编译器
+//            artifact = "io.grpc:protoc-gen-grpc-java:1.33.0" // Grpc单独的编译器
+            artifact = "io.grpc:protoc-gen-grpc-java:1.33.0:osx-x86_64"  // Grpc单独的编译器(arm mac 需要指定平台)
         }
         id("javalite") {
             artifact = "com.google.protobuf:protoc-gen-javalite:3.0.0"

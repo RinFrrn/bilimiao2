@@ -9,8 +9,10 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="foregroundColor">#000000</color>
-    <color name="windowBackgroundColor">#f2f2f2</color>
-    <color name="blockBackgroundColor">#ffffff</color>
+    <color name="windowBackgroundColor">#ffffff</color>
+    <color name="blockBackgroundColor">#f2f2f2</color>
+<!--    <color name="windowBackgroundColor">#f2f2f2</color>-->
+<!--    <color name="blockBackgroundColor">#ffffff</color>-->
     <color name="lineColor">#e6e6e6</color>
 
     <color name="darkForegroundColor">#ffffff</color>

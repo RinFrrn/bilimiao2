@@ -7,6 +7,7 @@ object MenuKeys {
 
     val setting = id_counter++
     val history = id_counter++
+    val favourite = id_counter++
     val download = id_counter++
     val search = id_counter++
 

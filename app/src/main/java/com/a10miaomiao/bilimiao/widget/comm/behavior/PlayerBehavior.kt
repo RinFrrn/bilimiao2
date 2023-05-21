@@ -17,15 +17,18 @@ import androidx.core.view.ViewCompat.offsetTopAndBottom
 import com.a10miaomiao.bilimiao.widget.comm.ScaffoldView
 import com.a10miaomiao.bilimiao.widget.player.DanmakuVideoPlayer
 import splitties.dimensions.dip
+import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
-class PlayerBehavior : CoordinatorLayout.Behavior<View> {
+class PlayerBehavior(context: Context, attrs: AttributeSet?) :
+    CoordinatorLayout.Behavior<View>(context, attrs) {
 
     var contentX = -1
     var contentY = -1
-    var contentHeight = 0
-    var contentWidth = 0
+    private val contentHeight: Int
+    private val contentWidth: Int
     var minPadding = 0
 
     var windowInsets = Insets.NONE
@@ -37,19 +40,14 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
 
     private var currentOrientation = ScaffoldView.VERTICAL
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+    var viewRef: View? = null
+    var parentRef: CoordinatorLayout? = null
+
+    init {
         contentHeight = context.dip(200)
         contentWidth = context.dip(300)
         minPadding = context.dip(10)
         dragAreaHeight = context.dip(30)
-        init()
-    }
-
-    var viewRef: View? = null
-    var parentRef: CoordinatorLayout? = null
-
-    fun init() {
-
     }
 
     fun setWindowInsets (left: Int, top: Int, right: Int, bottom: Int) {
@@ -62,6 +60,7 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
     }
 
     override fun onLayoutChild(parent: CoordinatorLayout, child: View, layoutDirection: Int): Boolean {
+
         if (parent is ScaffoldView && parent.showPlayer) {
             currentOrientation = parent.orientation
             if (parent.fullScreenPlayer) {
@@ -94,7 +93,9 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
 //                    width = contentWidth + child.paddingRight
 //                    child.layout(parent.measuredWidth - width, 0, parent.measuredWidth, height);
                 } else if (currentOrientation == ScaffoldView.VERTICAL) {
-                    height = contentHeight + child.paddingTop
+                    var computedHeight = (parent.measuredWidth.toDouble() / 16 * 9).roundToInt()
+                    computedHeight = min(computedHeight, (1.5 * contentHeight).roundToInt())
+                    height = computedHeight + child.paddingTop
                     width = parent.measuredWidth
                     child.layout(0, 0, width, height)
 //                    contentX = -1
@@ -189,6 +190,7 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
     /**
      * 拖拽超出屏幕，则左右吸边或上下吸边
      */
+    // TODO: 始终吸附至边缘，加入滑动惯性
     private fun resetPosition(event: MotionEvent, child: View) {
         val measuredWidth = parentRef?.measuredWidth ?: 0
         val measuredHeight = parentRef?.measuredHeight ?: 0
@@ -223,6 +225,7 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
             contentY = child.y.toInt()
         }
     }
+
 
 
 }

@@ -32,7 +32,7 @@ fun MiaoUI.mediaItemView (
         views {
             +imageView {
                 //            radius = dip(5)
-                apply(ViewStyle.roundRect(dip(5)))
+                apply(ViewStyle.roundRect(dip(6)))
                 scaleType = ImageView.ScaleType.CENTER_CROP
                 backgroundColor = 0xFF999999.toInt()
                 miaoEffect(cover) {
@@ -46,7 +46,8 @@ fun MiaoUI.mediaItemView (
             }..lParams(matchParent, dip(100))
 
             +verticalLayout {
-
+                apply(ViewStyle.roundRect(dip(6)))
+                backgroundColor = 0x55000000.toInt()
                 gravity = Gravity.CENTER
 
                 views {

@@ -1,9 +1,11 @@
 package com.a10miaomiao.bilimiao.widget.player
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.media.AudioManager
 import android.os.Build
 import android.util.AttributeSet
 import android.view.*
@@ -13,9 +15,9 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.delegate.helper.StatusBarHelper
-import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
 import com.a10miaomiao.bilimiao.config.config
 import com.a10miaomiao.bilimiao.widget.menu.CheckPopupMenu
+import com.shuyu.gsyvideoplayer.utils.CommonUtil
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
 import master.flame.danmaku.controller.DrawHandler
 import master.flame.danmaku.danmaku.model.BaseDanmaku
@@ -236,7 +238,7 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
     private fun initView() {
         isShowDragProgressTextOnSeekBar = true
         enlargeImageRes = R.drawable.ic_player_portrait_fullscreen
-        shrinkImageRes = R.drawable.ic_player_portrait_fullscreen
+        shrinkImageRes = R.drawable.ic_close_fullscreen_24  // FIXME: 无效
         setDialogVolumeProgressBar(context)
         setDialogProgressBar(context)
         initDanmakuContext()
@@ -273,8 +275,11 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
         mLockContainer.setOnClickListener(lockClickListener)
         mUnlockLeftIV.setOnClickListener(lockClickListener)
         mUnlockRightIV.setOnClickListener(lockClickListener)
-    }
 
+        // FIXME: 无效
+        isShowFullAnimation = true
+//        isReleaseWhenLossAudio
+    }
     private fun updateMode() {
         when (mode) {
             PlayerMode.SMALL_TOP, PlayerMode.SMALL_FLOAT -> {
@@ -582,7 +587,7 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
 
     override fun setSpeed(speed: Float, soundTouch: Boolean) {
         super.setSpeed(speed, soundTouch)
-        mPlaySpeedValue.text = "x$speed"
+        mPlaySpeedValue.text = "$speed×"
     }
 
     fun setWindowInsets(left: Int, top: Int, right: Int, bottom: Int) {
@@ -705,4 +710,44 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
         val to: Long,
         val content: String,
     )
+
+    // TODO: 改变进度调整幅度为绝对时间
+    override fun touchSurfaceMove(deltaX: Float, deltaY: Float, y: Float) {
+        var curWidth = 0
+        var curHeight = 0
+        if (activityContext != null) {
+            curWidth =
+                if (CommonUtil.getCurrentScreenLand(activityContext as Activity)) mScreenHeight else mScreenWidth
+            curHeight =
+                if (CommonUtil.getCurrentScreenLand(activityContext as Activity)) mScreenWidth else mScreenHeight
+        }
+        if (mChangePosition) {
+            val totalTimeDuration = duration
+            mSeekTimePosition =
+//                (mDownPosition + deltaX * totalTimeDuration / curWidth / mSeekRatio).toLong()
+                            (mDownPosition + deltaX * 33 / mSeekRatio).toLong()  // 每33个px？是1s
+            if (mSeekTimePosition < 0) { mSeekTimePosition = 0 }
+            if (mSeekTimePosition > totalTimeDuration) mSeekTimePosition = totalTimeDuration
+            val seekTime = CommonUtil.stringForTime(mSeekTimePosition)
+            val totalTime = CommonUtil.stringForTime(totalTimeDuration)
+            showProgressDialog(deltaX, seekTime, mSeekTimePosition, totalTime, totalTimeDuration)
+        }
+
+        // 不要音量亮度手势
+//        else if (mChangeVolume) {
+//            deltaY = -deltaY
+//            val max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+//            val deltaV = (max * deltaY * 3 / curHeight).toInt()
+//            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mGestureDownVolume + deltaV, 0)
+//            val volumePercent =
+//                (mGestureDownVolume * 100 / max + deltaY * 3 * 100 / curHeight).toInt()
+//            showVolumeDialog(-deltaY, volumePercent)
+//        } else if (mBrightness) {
+//            if (Math.abs(deltaY) > mThreshold) {
+//                val percent = -deltaY / curHeight
+//                onBrightnessSlide(percent)
+//                mDownY = y
+//            }
+//        }
+    }
 }

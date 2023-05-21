@@ -48,11 +48,11 @@ fun <T> RecyclerView._miaoAdapter(
         ) {}
     }
     var isInit = false
-    miaoEffect(mAdapter, {
+    miaoEffect(mAdapter) {
         isInit = true
         adapterInit?.invoke(mAdapter)
         this@_miaoAdapter.adapter = mAdapter
-    })
+    }
     miaoEffect(listOf(items?.size, *depsAry), {
         if (!isInit) {
             mAdapter.setList(items)

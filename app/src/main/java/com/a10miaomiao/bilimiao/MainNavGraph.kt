@@ -319,6 +319,7 @@ object MainNavGraph {
         val home_to_user = dest.home to dest.user
         val home_to_history = dest.home to dest.history
         val home_to_download = dest.home to dest.download
+        val home_to_userFavouriteList = dest.home to dest.userFavouriteList
 
         val setting_to_themeSetting = dest.setting to dest.themeSetting
         val setting_to_homeSetting = dest.setting to dest.homeSetting

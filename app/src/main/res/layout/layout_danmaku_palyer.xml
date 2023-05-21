@@ -286,8 +286,9 @@
                 android:id="@+id/play_speed_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="x1.0"
+                android:text="1.0×"
                 android:textColor="@android:color/white"
+                android:letterSpacing="0.1"
                 android:textSize="16sp" />
 
         </LinearLayout>

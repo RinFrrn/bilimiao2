@@ -23,7 +23,7 @@ class ScaffoldView @JvmOverloads constructor(
         const val VERTICAL = 1 // 竖屏
     }
 
-    var onPlayerChanged: ((show: Boolean) -> Unit)? = null
+    var  onPlayerChanged: ((show: Boolean) -> Unit)? = null
 
     var orientation = VERTICAL
         set(value) {
