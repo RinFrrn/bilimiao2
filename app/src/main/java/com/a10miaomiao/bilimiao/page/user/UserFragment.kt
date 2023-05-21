@@ -7,8 +7,10 @@ import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
+import androidx.navigation.NavType
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.a10miaomiao.miao.binding.android.view.*
 import cn.a10miaomiao.miao.binding.android.widget._text
@@ -17,12 +19,16 @@ import cn.a10miaomiao.miao.binding.miaoMemo
 import com.a10miaomiao.bilimiao.MainNavGraph
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.*
+import com.a10miaomiao.bilimiao.comm.entity.region.RegionInfo
 import com.a10miaomiao.bilimiao.comm.entity.user.SpaceInfo
 import com.a10miaomiao.bilimiao.comm.entity.user.UpperChannelInfo
 import com.a10miaomiao.bilimiao.comm.mypage.MyPage
 import com.a10miaomiao.bilimiao.comm.mypage.myMenuItem
 import com.a10miaomiao.bilimiao.comm.mypage.myPageConfig
 import com.a10miaomiao.bilimiao.comm.mypage.MenuItemPropInfo
+import com.a10miaomiao.bilimiao.comm.navigation.FragmentNavigatorBuilder
+import com.a10miaomiao.bilimiao.comm.navigation.MainNavArgs
+import com.a10miaomiao.bilimiao.comm.navigation.navigateToCompose
 import com.a10miaomiao.bilimiao.comm.recycler.*
 import com.a10miaomiao.bilimiao.comm.utils.ImageSaveUtil
 import com.a10miaomiao.bilimiao.comm.utils.NumberUtil
@@ -30,6 +36,12 @@ import com.a10miaomiao.bilimiao.commponents.season.miniSeasonItemView
 import com.a10miaomiao.bilimiao.commponents.video.mediaItemView
 import com.a10miaomiao.bilimiao.config.ViewStyle
 import com.a10miaomiao.bilimiao.config.config
+import com.a10miaomiao.bilimiao.page.bangumi.BangumiDetailFragment
+import com.a10miaomiao.bilimiao.page.user.bangumi.MyBangumiFragment
+import com.a10miaomiao.bilimiao.page.user.bangumi.UserBangumiFragment
+import com.a10miaomiao.bilimiao.page.user.favourite.UserFavouriteDetailFragment
+import com.a10miaomiao.bilimiao.page.user.favourite.UserFavouriteListFragment
+import com.a10miaomiao.bilimiao.page.video.VideoInfoFragment
 import com.a10miaomiao.bilimiao.store.WindowStore
 import com.a10miaomiao.bilimiao.widget.rcImageView
 import com.a10miaomiao.bilimiao.widget.wrapInLimitedFrameLayout
@@ -47,12 +59,34 @@ import org.kodein.di.instance
 import splitties.dimensions.dip
 import splitties.toast.toast
 import splitties.views.backgroundColor
+import splitties.views.bottomPadding
 import splitties.views.dsl.core.*
 import splitties.views.dsl.recyclerview.recyclerView
 import splitties.views.horizontalPadding
 import splitties.views.padding
 
 class UserFragment : Fragment(), DIAware, MyPage {
+
+    companion object : FragmentNavigatorBuilder() {
+        override val name = "region"
+        override fun FragmentNavigatorDestinationBuilder.init() {
+            deepLink("bilimiao://user/{id}")
+            deepLink("bilibili://user/{id}")
+            deepLink("bilibili://space/{id}")
+            argument(MainNavArgs.id) {
+                type = NavType.StringType
+                nullable = true
+            }
+        }
+
+        fun createArguments(
+            id: String
+        ): Bundle {
+            return bundleOf(
+                MainNavArgs.id to id
+            )
+        }
+    }
 
     override val pageConfig = myPageConfig {
         val info = viewModel.dataInfo
@@ -74,7 +108,7 @@ class UserFragment : Fragment(), DIAware, MyPage {
                 if (viewModel.isFollow) {
                     iconResource = R.drawable.ic_baseline_favorite_24
                     title = "已关注"
-                } else  {
+                } else {
                     iconResource = R.drawable.ic_outline_favorite_border_24
                     title = "关注"
                 }
@@ -143,57 +177,47 @@ class UserFragment : Fragment(), DIAware, MyPage {
         } else {
             when (it.tag) {
                 "archive" -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to viewModel.id,
-                        MainNavGraph.args.name to info.card.name
-                    )
+                    val args = UserArchiveListFragment.createArguments(viewModel.id, info.card.name)
                     Navigation.findNavController(it)
-                        .navigate(MainNavGraph.action.user_to_userArchiveList, args)
+                        .navigate(UserArchiveListFragment.actionId, args)
                 }
                 "season" -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to viewModel.id,
-                        MainNavGraph.args.name to info.card.name
-                    )
                     if (viewModel.isSelf) {
                         Navigation.findNavController(it)
-                            .navigate(MainNavGraph.action.user_to_myBangumi, args)
+                            .navigate(MyBangumiFragment.actionId)
                     } else {
+                        val args = UserBangumiFragment.createArguments(viewModel.id, info.card.name)
                         Navigation.findNavController(it)
-                            .navigate(MainNavGraph.action.user_to_userBangumi, args)
+                            .navigate(UserBangumiFragment.actionId, args)
                     }
 
                 }
                 "favourite" -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to viewModel.id,
-                        MainNavGraph.args.name to info.card.name
-                    )
+                    val args =
+                        UserFavouriteListFragment.createArguments(viewModel.id, info.card.name)
                     Navigation.findNavController(it)
-                        .navigate(MainNavGraph.action.user_to_userFavouriteList, args)
+                        .navigate(UserFavouriteListFragment.actionId, args)
                 }
                 "attention" -> {
 //                    val args = bundleOf(
-//                        MainNavGraph.args.id to viewModel.id,
-//                        MainNavGraph.args.name to info.card.name,
-//                        MainNavGraph.args.type to "follow",
+//                        MainNavArgs.id to viewModel.id,
+//                        MainNavArgs.name to info.card.name,
+//                        MainNavArgs.type to "follow",
 //                    )
 //                    Navigation.findNavController(it)
 //                        .navigate(MainNavGraph.action.user_to_userFollow, args)
                     val nav = it.findNavController()
                     val url = "bilimiao://user/${viewModel.id}/follow"
-                    nav.navigate(MainNavGraph.action.global_to_compose, bundleOf(
-                        MainNavGraph.args.url to url
-                    ))
+                    nav.navigateToCompose(url)
                 }
                 "fans" -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to viewModel.id,
-                        MainNavGraph.args.name to info.card.name,
-                        MainNavGraph.args.type to "fans",
+                    val args = UserFollowFragment.createArguments(
+                        id = viewModel.id,
+                        type = "fans",
+                        name = info.card.name,
                     )
                     Navigation.findNavController(it)
-                        .navigate(MainNavGraph.action.user_to_userFollow, args)
+                        .navigate(UserFollowFragment.actionId, args)
                 }
             }
         }
@@ -205,46 +229,42 @@ class UserFragment : Fragment(), DIAware, MyPage {
             when (item) {
                 // 跳转视频
                 is SpaceInfo.ArchiveItem -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to item.param
-                    )
+                    val args = VideoInfoFragment.createArguments(item.param)
                     Navigation.findNavController(view)
-                        .navigate(MainNavGraph.action.user_to_videoInfo, args)
+                        .navigate(VideoInfoFragment.actionId, args)
                 }
                 // 跳转收藏详情
                 is SpaceInfo.FavouriteItem -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to item.media_id.toString(),
-                        MainNavGraph.args.name to item.name
+                    val args = UserFavouriteDetailFragment.createArguments(
+                        item.media_id.toString(),
+                        item.name,
                     )
                     Navigation.findNavController(view)
-                        .navigate(MainNavGraph.action.user_to_userFavouriteDetail, args)
+                        .navigate(UserFavouriteDetailFragment.actionId, args)
                 }
                 is SpaceInfo.Favourite2Item -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to item.media_id,
-                        MainNavGraph.args.name to item.title
+                    val args = UserFavouriteDetailFragment.createArguments(
+                        item.media_id,
+                        item.title,
                     )
                     Navigation.findNavController(view)
-                        .navigate(MainNavGraph.action.user_to_userFavouriteDetail, args)
+                        .navigate(UserFavouriteDetailFragment.actionId, args)
                 }
                 // 跳转番剧
                 is UpperChannelInfo -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to item.cid,
-                        MainNavGraph.args.parent to item.mid,
-                        MainNavGraph.args.name to item.name
+                    val args = UserChannelDetailFragment.createArguments(
+                        id = item.cid,
+                        parent = item.mid,
+                        name = item.name
                     )
                     Navigation.findNavController(view)
-                        .navigate(MainNavGraph.action.user_to_userChannelDetail, args)
+                        .navigate(UserChannelDetailFragment.actionId, args)
                 }
                 // 跳转番剧
                 is SpaceInfo.SeasonItem -> {
-                    val args = bundleOf(
-                        MainNavGraph.args.id to item.param
-                    )
+                    val args = BangumiDetailFragment.createArguments(item.param)
                     Navigation.findNavController(view)
-                        .navigate(MainNavGraph.action.user_to_bangumiDetail, args)
+                        .navigate(BangumiDetailFragment.actionId, args)
                 }
             }
         }
@@ -321,7 +341,7 @@ class UserFragment : Fragment(), DIAware, MyPage {
         }
     }
 
-    fun MiaoUI.userCardView(): View{
+    fun MiaoUI.userCardView(): View {
         val userInfo = viewModel.dataInfo
         return verticalLayout {
             backgroundColor = config.blockBackgroundColor
@@ -426,7 +446,7 @@ class UserFragment : Fragment(), DIAware, MyPage {
     private fun MiaoUI.archiveItemView(
         cover: String,
         title: String
-    ) : View{
+    ): View {
         return verticalLayout {
             padding = dip(5)
             setBackgroundResource(config.selectableItemBackground)
@@ -466,15 +486,20 @@ class UserFragment : Fragment(), DIAware, MyPage {
             val mAdapter = _miaoAdapter(null, itemUi)
 
             headerViews(mAdapter) {
-                +userCardView()..lParams(matchParent, wrapContent) {
-                    horizontalMargin = config.pagePadding
-                    _topMargin = contentInsets.top + config.pagePadding
+                +frameLayout {
+                    _topPadding = contentInsets.top
                 }
 
-                val subject = if(viewModel.isSelf) "我" else "Ta"
+                +userCardView().apply {
+                }..lParams(matchParent, wrapContent) {
+                    horizontalMargin = config.pagePadding
+                    topMargin = config.pagePadding
+                }
+
+                val subject = if (viewModel.isSelf) "我" else "Ta"
 
                 // 投稿
-                var isShow = viewModel.dataInfo?.archive?.count?: 0 > 0
+                var isShow = viewModel.dataInfo?.archive?.count ?: 0 > 0
                 +mediaTitleView(
                     title = "${subject}的投稿",
                     isShow = isShow,
@@ -498,7 +523,7 @@ class UserFragment : Fragment(), DIAware, MyPage {
                     _miaoAdapter(
                         items = viewModel.dataInfo?.archive?.item?.toMutableList(),
                         itemUi = itemUi,
-                    ){
+                    ) {
                         setOnItemClickListener(handleItemClick)
                     }
                 }..lParams(matchParent, wrapContent)
@@ -531,13 +556,13 @@ class UserFragment : Fragment(), DIAware, MyPage {
                     _miaoAdapter(
                         items = viewModel.channelList.toMutableList(),
                         itemUi = itemUi,
-                    ){
+                    ) {
                         setOnItemClickListener(handleItemClick)
                     }
                 }..lParams(matchParent, wrapContent)
 
                 // 追番
-                isShow = viewModel.dataInfo?.season?.count?: 0 > 0
+                isShow = viewModel.dataInfo?.season?.count ?: 0 > 0
                 +mediaTitleView(
                     title = "${subject}的追番",
                     isShow = isShow,
@@ -564,13 +589,13 @@ class UserFragment : Fragment(), DIAware, MyPage {
                     _miaoAdapter(
                         items = viewModel.dataInfo?.season?.item?.toMutableList(),
                         itemUi = itemUi,
-                    ){
+                    ) {
                         setOnItemClickListener(handleItemClick)
                     }
                 }..lParams(matchParent, wrapContent)
 
                 // 收藏
-                isShow = viewModel.dataInfo?.favourite2?.count?: 0 > 0
+                isShow = viewModel.dataInfo?.favourite2?.count ?: 0 > 0
                 +mediaTitleView(
                     title = "${subject}的收藏",
                     isShow = isShow,
@@ -598,13 +623,13 @@ class UserFragment : Fragment(), DIAware, MyPage {
                     _miaoAdapter(
                         items = viewModel.dataInfo?.favourite2?.item?.toMutableList(),
                         itemUi = itemUi,
-                    ){
+                    ) {
                         setOnItemClickListener(handleItemClick)
                     }
                 }..lParams(matchParent, wrapContent)
 
                 // 推荐
-                isShow = viewModel.dataInfo?.like_archive?.count?: 0 > 0
+                isShow = viewModel.dataInfo?.like_archive?.count ?: 0 > 0
                 +mediaTitleView(
                     title = "${subject}推荐的",
                     isShow = isShow,
@@ -615,7 +640,6 @@ class UserFragment : Fragment(), DIAware, MyPage {
                 +recyclerView {
                     horizontalPadding = config.pagePadding
                     _show = isShow
-                    _bottomPadding = contentInsets.bottom + config.pagePadding
                     isNestedScrollingEnabled = false
                     _miaoLayoutManage(
                         GridAutofitLayoutManager(requireContext(), requireContext().dip(150))
@@ -628,10 +652,13 @@ class UserFragment : Fragment(), DIAware, MyPage {
                     _miaoAdapter(
                         items = viewModel.dataInfo?.like_archive?.item?.toMutableList(),
                         itemUi = itemUi,
-                    ){
+                    ) {
                         setOnItemClickListener(handleItemClick)
                     }
                 }..lParams(matchParent, wrapContent)
+                +frameLayout {
+                    _topPadding = contentInsets.bottom + config.pagePadding
+                }
             }
         }.wrapInLimitedFrameLayout {
             maxWidth = config.containerWidth

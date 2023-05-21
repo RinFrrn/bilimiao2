@@ -13,8 +13,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
+import androidx.navigation.NavType
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.a10miaomiao.miao.binding.android.view.*
@@ -25,11 +26,17 @@ import com.a10miaomiao.bilimiao.comm.*
 import com.a10miaomiao.bilimiao.comm.delegate.player.BasePlayerDelegate
 import com.a10miaomiao.bilimiao.comm.delegate.theme.ThemeDelegate
 import com.a10miaomiao.bilimiao.comm.dsl.addOnDoubleClickTabListener
+import com.a10miaomiao.bilimiao.comm.entity.region.RegionInfo
 import com.a10miaomiao.bilimiao.comm.mypage.*
+import com.a10miaomiao.bilimiao.comm.navigation.FragmentNavigatorBuilder
 import com.a10miaomiao.bilimiao.comm.recycler.RecyclerViewFragment
 import com.a10miaomiao.bilimiao.comm.store.UserStore
+import com.a10miaomiao.bilimiao.page.download.DownloadFragment
 import com.a10miaomiao.bilimiao.page.home.*
+import com.a10miaomiao.bilimiao.page.search.SearchStartFragment
+import com.a10miaomiao.bilimiao.page.user.HistoryFragment
 import com.a10miaomiao.bilimiao.store.WindowStore
+import com.a10miaomiao.bilimiao.template.SettingFragment
 import com.a10miaomiao.bilimiao.template.TemplateFragment
 import com.a10miaomiao.bilimiao.widget.comm.getScaffoldView
 import com.a10miaomiao.bilimiao.widget.wrapInViewPager2Container
@@ -39,12 +46,15 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.kongzue.dialogx.dialogs.PopTip
 import org.kodein.di.*
 import splitties.experimental.InternalSplittiesApi
-import splitties.toast.toast
 import splitties.views.dsl.core.*
 import kotlin.reflect.KClass
 
 
 class MainFragment : Fragment(), DIAware, MyPage {
+
+    companion object : FragmentNavigatorBuilder() {
+        override val name = "main"
+    }
 
     private var pageTitle = "bilimiao\n-\n首页"
 
@@ -94,10 +104,17 @@ class MainFragment : Fragment(), DIAware, MyPage {
         val nav = requireActivity().findNavController(R.id.nav_host_fragment)
         when (menuItem.key) {
             MenuKeys.setting -> {
-                nav.navigate(MainNavGraph.action.home_to_setting)
+                nav.navigate(SettingFragment.actionId)
             }
             MenuKeys.history -> {
-                nav.navigate(MainNavGraph.action.home_to_history)
+                nav.navigate(HistoryFragment.actionId)
+            }
+            MenuKeys.favourite -> {
+                val args = bundleOf(
+                    MainNavGraph.args.id to userStore.state.info!!.mid.toString(),
+                    MainNavGraph.args.name to userStore.state.info!!.name
+                )
+                nav.navigate(MainNavGraph.action.home_to_userFavouriteList, args)
             }
             MenuKeys.favourite -> {
                 val args = bundleOf(
@@ -107,11 +124,11 @@ class MainFragment : Fragment(), DIAware, MyPage {
                 nav.navigate(MainNavGraph.action.home_to_userFavouriteList, args)
             }
             MenuKeys.download -> {
-                nav.navigate(MainNavGraph.action.home_to_download)
+                nav.navigate(DownloadFragment.actionId)
             }
             MenuKeys.search -> {
                 val bsNav = requireActivity().findNavController(R.id.nav_bottom_sheet_fragment)
-                bsNav.navigate(MainNavGraph.action.global_to_searchStart)
+                bsNav.navigate(SearchStartFragment.actionId)
             }
         }
     }

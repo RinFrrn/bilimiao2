@@ -1,17 +1,12 @@
 package com.a10miaomiao.bilimiao.widget.comm.behavior
 
 import android.content.Context
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
-import android.os.Message
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.DecelerateInterpolator
+import android.view.animation.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.Insets
-import androidx.core.os.postDelayed
 import androidx.core.view.ViewCompat.offsetLeftAndRight
 import androidx.core.view.ViewCompat.offsetTopAndBottom
 import com.a10miaomiao.bilimiao.widget.comm.ScaffoldView
@@ -25,10 +20,10 @@ import kotlin.math.roundToInt
 class PlayerBehavior(context: Context, attrs: AttributeSet?) :
     CoordinatorLayout.Behavior<View>(context, attrs) {
 
-    var contentX = -1
-    var contentY = -1
-    private val contentHeight: Int
-    private val contentWidth: Int
+    var playerX = -1
+    var playerY = -1
+    var playerHeight = 0
+    var playertWidth = 0
     var minPadding = 0
 
     var windowInsets = Insets.NONE
@@ -38,19 +33,25 @@ class PlayerBehavior(context: Context, attrs: AttributeSet?) :
 
     var dragAreaHeight = 0
 
+    var isShowChild = false
+
     private var currentOrientation = ScaffoldView.VERTICAL
 
-    var viewRef: View? = null
-    var parentRef: CoordinatorLayout? = null
-
-    init {
-        contentHeight = context.dip(200)
-        contentWidth = context.dip(300)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        playerHeight = context.dip(200)
+        playertWidth = context.dip(300)
         minPadding = context.dip(10)
         dragAreaHeight = context.dip(30)
     }
 
-    fun setWindowInsets (left: Int, top: Int, right: Int, bottom: Int) {
+    var viewRef: View? = null
+    var parentRef: CoordinatorLayout? = null
+
+    fun init() {
+
+    }
+
+    fun setWindowInsets(left: Int, top: Int, right: Int, bottom: Int) {
         windowInsets = Insets.of(
             max(minPadding, left),
             max(minPadding, top),
@@ -59,69 +60,119 @@ class PlayerBehavior(context: Context, attrs: AttributeSet?) :
         )
     }
 
-    override fun onLayoutChild(parent: CoordinatorLayout, child: View, layoutDirection: Int): Boolean {
+    /**
+     * 全屏播放布局
+     */
+    private fun onFullScreenLayoutChild(
+        parent: ScaffoldView,
+        child: View,
+    ) {
+        height = parent.measuredHeight
+        width = parent.measuredWidth
+//      playerX = -1
+//      playerY = -1
+        child.layout(0, 0, width, height)
+        child.translationX = 0f
+        child.translationY = 0f
+    }
 
-        if (parent is ScaffoldView && parent.showPlayer) {
-            currentOrientation = parent.orientation
-            if (parent.fullScreenPlayer) {
-                height = parent.measuredHeight
-                width = parent.measuredWidth
-//                contentX = -1
-//                contentY = -1
-                child.layout(0, 0, width, height)
-                child.translationX = 0f
-                child.translationY = 0f
-            } else if(!isMove) {
-                if (currentOrientation == ScaffoldView.HORIZONTAL) {
-                    height = contentHeight
-                    width = contentWidth
-//                    val parentWidth = parent.measuredWidth - windowInsets.left - windowInsets.right
-//                    val parentHeight = parent.measuredHeight - windowInsets.top - windowInsets.bottom
-//                    val left = (parentWidth - width) / 2 + windowInsets.left
-//                    val top = (parentHeight - height) / 2 + windowInsets.top
-//                    child.layout(left, top,  left + width, top + height)
-                    val left = if (contentX == -1) {
-                        parent.measuredWidth - windowInsets.right - width
-                    } else { contentX }
-                    val top =  if (contentY == -1) {
-                        windowInsets.top
-                    } else { contentY }
-                    child.layout(left, top,  left + width, top + height)
-                    child.translationX = 0f
-                    child.translationY = 0f
-//                    height = parent.measuredHeight
-//                    width = contentWidth + child.paddingRight
-//                    child.layout(parent.measuredWidth - width, 0, parent.measuredWidth, height);
-                } else if (currentOrientation == ScaffoldView.VERTICAL) {
-                    var computedHeight = (parent.measuredWidth.toDouble() / 16 * 9).roundToInt()
-                    computedHeight = min(computedHeight, (1.5 * contentHeight).roundToInt())
-                    height = computedHeight + child.paddingTop
-                    width = parent.measuredWidth
-                    child.layout(0, 0, width, height)
-//                    contentX = -1
-//                    contentY = -1
-                    child.translationX = 0f
-                    child.translationY = 0f
-                }
+    /**
+     * 横向屏幕下布局
+     */
+    private fun onHorizontalScreenLayoutChild(
+        parent: ScaffoldView,
+        child: View,
+    ) {
+        if (parent.showPlayer) {
+            height = playerHeight
+            width = playertWidth
+            val left = if (playerX == -1) {
+                parent.measuredWidth - windowInsets.right - width
+            } else {
+                playerX
             }
-            if (child.layoutParams.height != height || child.layoutParams.width != width) {
-                child.layoutParams.height = height
-                child.layoutParams.width = width
-                child.requestLayout()
+            val top = if (playerY == -1) {
+                windowInsets.top
+            } else {
+                playerY
             }
-            if (parent.playerHeight != height || parent.playerWidth != width) {
-                parent.playerHeight = height
-                parent.playerWidth= width
-                parent.content?.requestLayout()
-            }
-        } else if (parent is ScaffoldView) {
-            parent.playerHeight = 0
-            parent.playerWidth= 0
-//            contentX = -1
-//            contentY = -1
-            child.layout(0, 0, 0, 0)
+            child.layout(left, top, left + width, top + height)
+        } else {
+            height = 0
+            width = 0
+//            playerX = -1
+//            playerY = -1
+//            child.layout(0, 0, 0, 0)
         }
+    }
 
+    /**
+     * 竖直屏幕下布局
+     */
+    private fun onVerticalScreenLayoutChild(
+        parent: ScaffoldView,
+        child: View,
+    ) {
+        if (parent.showPlayer) {
+            var computedHeight = (parent.measuredWidth.toDouble() / 16 * 9).roundToInt()
+            computedHeight = min(computedHeight, (1.5 * contentHeight).roundToInt())
+            height = computedHeight + child.paddingTop
+            //height = playerHeight + child.paddingTop
+            width = parent.measuredWidth
+            child.layout(0, 0, width, height)
+//            playerX = -1
+//            playerY = -1
+        } else {
+            height = 0
+            width = 0
+//            playerX = -1
+//            playerY = -1
+//            child.layout(0, 0, 0, 0)
+        }
+    }
+
+    override fun onLayoutChild(
+        parent: CoordinatorLayout,
+        child: View,
+        layoutDirection: Int
+    ): Boolean {
+        if (isMove) {
+            return false
+        }
+        val scaffoldView = parent as? ScaffoldView ?: return false
+        currentOrientation = scaffoldView.orientation
+        if (scaffoldView.fullScreenPlayer) {
+            // 全屏
+            onFullScreenLayoutChild(scaffoldView, child)
+        } else if (currentOrientation == ScaffoldView.HORIZONTAL) {
+            // 横向屏幕
+            onHorizontalScreenLayoutChild(scaffoldView, child)
+        } else {
+            // 竖向屏幕
+            onVerticalScreenLayoutChild(scaffoldView, child)
+        }
+        // 播放器尺寸校正
+        if (child.layoutParams.height != height || child.layoutParams.width != width) {
+            child.layoutParams.height = height
+            child.layoutParams.width = width
+            child.requestLayout()
+        }
+        // 内容区域布局尺寸校正
+        if (parent.playerHeight != height || parent.playerWidth != width) {
+            parent.playerHeight = height
+            parent.playerWidth = width
+            parent.content?.requestLayout()
+        }
+        // 显示隐藏动画控制
+        if (parent.showPlayer && !isShowChild) {
+            isShowChild = true
+            child.translationX = 0f
+            child.translationY = 0f
+            startShowAnimation(child)
+        } else if (!parent.showPlayer && isShowChild) {
+            isShowChild = false
+            startHideAnimation(child)
+        }
         this.viewRef = child
         this.parentRef = parent
         return true
@@ -133,7 +184,11 @@ class PlayerBehavior(context: Context, attrs: AttributeSet?) :
     private var mFirstX: Int = 0
     private var isMove = false
 
-    override fun onInterceptTouchEvent(parent: CoordinatorLayout, child: View, event: MotionEvent): Boolean {
+    override fun onInterceptTouchEvent(
+        parent: CoordinatorLayout,
+        child: View,
+        event: MotionEvent
+    ): Boolean {
         val x = event.x
         val y = event.y
         return parent is ScaffoldView && parent.showPlayer && !parent.fullScreenPlayer
@@ -152,7 +207,8 @@ class PlayerBehavior(context: Context, attrs: AttributeSet?) :
                 if (child.x < x
                     && child.y < y
                     && child.x + width > x
-                    && child.y + dragAreaHeight > y) {
+                    && child.y + dragAreaHeight > y
+                ) {
                     isMove = true
                     mDownX = x
                     mDownY = y
@@ -168,8 +224,8 @@ class PlayerBehavior(context: Context, attrs: AttributeSet?) :
                 if (isMove) {
                     offsetTopAndBottom(child, (y - mDownY).toInt())
                     offsetLeftAndRight(child, (x - mDownX).toInt())
-                    contentX = child.x.toInt()
-                    contentY = child.y.toInt()
+                    playerX = child.x.toInt()
+                    playerY = child.y.toInt()
                     mDownX = x
                     mDownY = y
                 }
@@ -195,37 +251,100 @@ class PlayerBehavior(context: Context, attrs: AttributeSet?) :
         val measuredWidth = parentRef?.measuredWidth ?: 0
         val measuredHeight = parentRef?.measuredHeight ?: 0
         if (child.x < windowInsets.left) {
-            contentX = windowInsets.left
+            playerX = windowInsets.left
             child.animate().setInterpolator(DecelerateInterpolator())
                 .setDuration(200)
-                .x(contentX.toFloat())
+                .x(playerX.toFloat())
                 .start()
-        } else if (child.x > measuredWidth - width - windowInsets.right){
-            contentX = measuredWidth - width - windowInsets.right
+        } else if (child.x > measuredWidth - width - windowInsets.right) {
+            playerX = measuredWidth - width - windowInsets.right
             child.animate().setInterpolator(DecelerateInterpolator())
                 .setDuration(200)
-                .x(contentX.toFloat())
+                .x(playerX.toFloat())
                 .start()
         } else {
-            contentX = child.x.toInt()
+            playerX = child.x.toInt()
         }
         if (child.y < windowInsets.top) {
-            contentY = windowInsets.top
+            playerY = windowInsets.top
             child.animate().setInterpolator(DecelerateInterpolator())
                 .setDuration(200)
-                .y(contentY.toFloat())
+                .y(playerY.toFloat())
                 .start()
-        } else if (child.y > measuredHeight - height - windowInsets.bottom){
-            contentY = measuredHeight - height - windowInsets.bottom
+        } else if (child.y > measuredHeight - height - windowInsets.bottom) {
+            playerY = measuredHeight - height - windowInsets.bottom
             child.animate().setInterpolator(DecelerateInterpolator())
                 .setDuration(200)
-                .y(contentY.toFloat())
+                .y(playerY.toFloat())
                 .start()
         } else {
-            contentY = child.y.toInt()
+            playerY = child.y.toInt()
         }
     }
 
+    // 显示动画
+    private val showAnimation = AnimationSet(true).apply {
+        addAnimation(
+            ScaleAnimation(
+                0.2f, 1f,
+                0.1f, 1f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0f,
+            )
+        )
+        addAnimation(
+            AlphaAnimation(0f, 1f)
+        )
+        interpolator = DecelerateInterpolator()
+        repeatMode = Animation.REVERSE
+        duration = 200
+    }
 
+    // 隐藏动画
+    private val hideAnimation = AnimationSet(true).apply {
+        addAnimation(
+            ScaleAnimation(
+                1f, 0.2f,
+                1f, 0.1f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0f,
+            )
+        )
+        addAnimation(
+            AlphaAnimation(1f, 0f)
+        )
+        interpolator = AccelerateInterpolator()
+        repeatMode = Animation.REVERSE
+        duration = 200
+    }
 
+    private fun startShowAnimation(child: View) {
+        child.startAnimation(showAnimation)
+//        showAnimation.setAnimationListener(object : Animation.AnimationListener {
+//            override fun onAnimationStart(animation: Animation) {
+//                child.visibility = View.VISIBLE
+//            }
+//
+//            override fun onAnimationEnd(animation: Animation) {
+//            }
+//
+//            override fun onAnimationRepeat(animation: Animation) {}
+//        })
+    }
+
+    private fun startHideAnimation(child: View) {
+        // 关闭动画
+        child.startAnimation(hideAnimation)
+        hideAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {}
+            override fun onAnimationEnd(animation: Animation) {
+                child.layout(0, 0, 0, 0)
+//                child.visibility = View.GONE
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
+    }
 }
+
+

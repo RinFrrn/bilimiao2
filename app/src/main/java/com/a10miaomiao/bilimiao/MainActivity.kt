@@ -117,7 +117,7 @@ class MainActivity
         navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        MainNavGraph.createGraph(navController, MainNavGraph.dest.home)
+        MainNavGraph.createGraph(navController, MainNavGraph.dest.main)
         navController.addOnDestinationChangedListener(this)
         navHostFragment.childFragmentManager.addFragmentOnAttachListener(this)
 
@@ -159,6 +159,7 @@ class MainActivity
             }
         }
 
+//        DebugMiao.log(IMiaoNavList.navList)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -191,7 +192,7 @@ class MainActivity
         destination: NavDestination,
         arguments: Bundle?
     ) {
-        ui.mAppBar.canBack = destination.id != MainNavGraph.dest.home
+        ui.mAppBar.canBack = destination.id != MainNavGraph.dest.main
 //        ui.mAppBar.cleanProp()
     }
 
@@ -210,7 +211,7 @@ class MainActivity
 
     private fun goBackHome(): Boolean {
         val nav = findNavController(R.id.nav_host_fragment)
-        return nav.popBackStack(MainNavGraph.dest.home, false)
+        return nav.popBackStack(MainNavGraph.dest.main, false)
     }
 
     val onBackClick = View.OnClickListener {
@@ -276,10 +277,16 @@ class MainActivity
         val showPlayer = ui.root.showPlayer
         val fullScreenPlayer = ui.root.fullScreenPlayer
         if (ui.root.orientation == ScaffoldView.VERTICAL) {
-            windowStore.setContentInsets(
-                left, if (showPlayer) 0 else top, right, bottom + config.appBarTitleHeight,
-            )
-            windowStore.setBottomAppBarHeight(bottom + config.appBarHeight)
+            if (showPlayer) {
+                windowStore.setContentInsets(
+                    left, 0, right, bottom + config.appBarTitleHeight + ui.root.playerHeight,
+                )
+            } else {
+                windowStore.setContentInsets(
+                    left, top, right, bottom + config.appBarTitleHeight,
+                )
+            }
+            windowStore.setBottomAppBarHeight(config.appBarMenuHeight)
             ui.mAppBar.setPadding(
                 left, 0, right, bottom
             )
@@ -293,7 +300,7 @@ class MainActivity
             windowStore.setContentInsets(
                 0, top, right, bottom,
             )
-            windowStore.setBottomAppBarHeight(bottom)
+            windowStore.setBottomAppBarHeight(0)
             ui.mAppBar.setPadding(
                 left, top, 0, bottom
             )
@@ -409,6 +416,7 @@ class MainActivity
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         basePlayerDelegate.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
