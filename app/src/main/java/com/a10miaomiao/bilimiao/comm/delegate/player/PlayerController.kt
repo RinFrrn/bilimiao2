@@ -11,6 +11,7 @@ import android.util.Rational
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.navigation.findNavController
@@ -19,7 +20,6 @@ import com.a10miaomiao.bilimiao.comm.delegate.helper.StatusBarHelper
 import com.a10miaomiao.bilimiao.comm.dialogx.showTop
 import com.a10miaomiao.bilimiao.comm.store.UserStore
 import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
-import com.a10miaomiao.bilimiao.config.config
 import com.a10miaomiao.bilimiao.page.setting.VideoSettingFragment
 import com.a10miaomiao.bilimiao.service.PlayerService
 import com.a10miaomiao.bilimiao.widget.comm.ScaffoldView
@@ -29,6 +29,7 @@ import com.duzhaokun123.bilibilihd2.utils.GestureRecognizer
 import com.duzhaokun123.bilibilihd2.utils.VibratorUtil
 import com.kongzue.dialogx.dialogs.PopTip
 import com.shuyu.gsyvideoplayer.listener.GSYVideoProgressListener
+import com.shuyu.gsyvideoplayer.video.base.GSYVideoView
 import master.flame.danmaku.danmaku.model.BaseDanmaku
 import master.flame.danmaku.danmaku.model.android.DanmakuContext
 import org.kodein.di.DI
@@ -405,6 +406,11 @@ class PlayerController(
             }
         }
         PlayerService.selfInstance?.playerState = state
+        if (state >= GSYVideoView.CURRENT_STATE_PAUSE) {
+            activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
     }
 
     override fun onVideoClose() {
