@@ -13,27 +13,23 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavType
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.a10miaomiao.miao.binding.android.view.*
 import cn.a10miaomiao.miao.binding.miaoEffect
-import com.a10miaomiao.bilimiao.MainNavGraph
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.*
 import com.a10miaomiao.bilimiao.comm.delegate.player.BasePlayerDelegate
 import com.a10miaomiao.bilimiao.comm.delegate.theme.ThemeDelegate
 import com.a10miaomiao.bilimiao.comm.dsl.addOnDoubleClickTabListener
-import com.a10miaomiao.bilimiao.comm.entity.region.RegionInfo
 import com.a10miaomiao.bilimiao.comm.mypage.*
 import com.a10miaomiao.bilimiao.comm.navigation.FragmentNavigatorBuilder
+import com.a10miaomiao.bilimiao.comm.navigation.navigateToCompose
+import com.a10miaomiao.bilimiao.comm.navigation.openSearchDrawer
 import com.a10miaomiao.bilimiao.comm.recycler.RecyclerViewFragment
 import com.a10miaomiao.bilimiao.comm.store.UserStore
-import com.a10miaomiao.bilimiao.page.download.DownloadFragment
 import com.a10miaomiao.bilimiao.page.home.*
-import com.a10miaomiao.bilimiao.page.search.SearchStartFragment
 import com.a10miaomiao.bilimiao.page.user.HistoryFragment
 import com.a10miaomiao.bilimiao.page.user.favourite.UserFavouriteListFragment
 import com.a10miaomiao.bilimiao.store.WindowStore
@@ -118,11 +114,12 @@ class MainFragment : Fragment(), DIAware, MyPage {
                 nav.navigate(UserFavouriteListFragment.actionId, args)
             }
             MenuKeys.download -> {
-                nav.navigate(DownloadFragment.actionId)
+                nav.navigateToCompose("bilimiao://download/list")
             }
             MenuKeys.search -> {
-                val bsNav = requireActivity().findNavController(R.id.nav_bottom_sheet_fragment)
-                bsNav.navigate(SearchStartFragment.actionId)
+//                val bsNav = requireActivity().findNavController(R.id.nav_bottom_sheet_fragment)
+//                bsNav.navigate(SearchStartFragment.actionId)
+                scaffoldApp.openSearchDrawer()
             }
         }
     }
@@ -184,6 +181,7 @@ class MainFragment : Fragment(), DIAware, MyPage {
                             backKeyPressedTimes = now
                         } else {
                             playerDelegate.closePlayer()
+                            backKeyPressedTimes = 0
                         }
                     } else {
                         if (now - backKeyPressedTimes > 2000) {

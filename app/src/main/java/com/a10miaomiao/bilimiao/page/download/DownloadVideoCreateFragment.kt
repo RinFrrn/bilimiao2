@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -17,12 +18,8 @@ import cn.a10miaomiao.miao.binding.android.widget._text
 import cn.a10miaomiao.miao.binding.android.widget._textColorResource
 import cn.a10miaomiao.miao.binding.miaoEffect
 import cn.a10miaomiao.miao.binding.miaoMemo
-import com.a10miaomiao.bilimiao.MainNavGraph
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.*
-import com.a10miaomiao.bilimiao.comm.delegate.download.DownloadDelegate
-import com.a10miaomiao.bilimiao.comm.entity.video.VideoInfo
-import com.a10miaomiao.bilimiao.comm.entity.video.VideoPageInfo
 import com.a10miaomiao.bilimiao.comm.mypage.MyPage
 import com.a10miaomiao.bilimiao.comm.mypage.myPageConfig
 import com.a10miaomiao.bilimiao.comm.navigation.FragmentNavigatorBuilder
@@ -70,7 +67,6 @@ class DownloadVideoCreateFragment : Fragment(), DIAware, MyPage {
     private val viewModel by diViewModel<DownloadVideoCreateViewModel>(di)
 
     private val windowStore by instance<WindowStore>()
-    private val downloadDelegate by instance<DownloadDelegate>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -97,6 +93,15 @@ class DownloadVideoCreateFragment : Fragment(), DIAware, MyPage {
         viewModel.selectedItem(item)
     }
 
+    val handleItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            viewModel.selectedQuality(viewModel.acceptQuality[position])
+        }
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+        }
+    }
+
     val itemUi = miaoBindingItemUi<DownloadVideoCreateParam.Page> { item, index ->
         frameLayout {
             setBackgroundResource(R.drawable.shape_corner)
@@ -107,9 +112,8 @@ class DownloadVideoCreateFragment : Fragment(), DIAware, MyPage {
                 bottomMargin = dip(10)
             }
 
-            val curAid = viewModel.video.aid
-            val isCreated = downloadDelegate.downloadList.indexOfFirst {
-                curAid == it.avid.toString() && item.cid == it.page_data.cid.toString()
+            val isCreated = viewModel.downloadedList.indexOfFirst {
+                item.cid == it.page_data?.cid?.toString()
             } != -1
             val isSelected = viewModel.selectedList.indexOf(item.cid) != -1
             _isEnabled = !isCreated
@@ -173,10 +177,10 @@ class DownloadVideoCreateFragment : Fragment(), DIAware, MyPage {
                                 mAdapter.clear()
                                 mAdapter.addAll(viewModel.acceptDescription)
                             }
-//                    miaoEffect(viewModel.spinnerSelected) {
-//                        setSelection(it)
-//                    }
-//                    onItemChanged(viewModel::changedSpinnerItem)
+                            miaoEffect(viewModel.qualityIndex) {
+                                setSelection(it)
+                            }
+                            onItemSelectedListener = handleItemSelectedListener
                         }..lParams(width = wrapContent)
                     }
                 }

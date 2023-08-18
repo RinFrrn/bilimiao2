@@ -54,6 +54,7 @@ object Libraries {
     const val composeMaterial3WindowSizeClass = "androidx.compose.material3:material3-window-size-class:1.0.1"
     const val activityCompose = "androidx.activity:activity-compose:1.3.1"
     const val navigationCompose = "androidx.navigation:navigation-compose:${Versions.navigation}"
+    const val composeMaterialIconsExtended = "androidx.compose.material:material-icons-extended:$${Versions.compose}"
     const val glideCompose = "com.github.skydoves:landscapist-glide:2.0.0"
     // compose控件
     const val accompanistSwipeRefresh = "com.google.accompanist:accompanist-swiperefresh:${Versions.accompanist}"
@@ -78,8 +79,8 @@ object Libraries {
     const val foregroundCompat = "me.zhanghai.android.foregroundcompat:library:1.0.2"
     const val drawer = "com.drakeet.drawer:drawer:1.0.3"
     const val modernAndroidPreferences = "de.maxr1998:modernandroidpreferences:2.2.0"
-    const val dialogX = "com.kongzue.dialogx:DialogX:0.0.47"
-    const val dialogXMaterialYou = "com.kongzue.dialogx.style:DialogXMaterialYouStyle:0.0.47"
+    const val dialogX = "com.kongzue.dialogx:DialogX:0.0.48"
+    const val dialogXMaterialYou = "com.kongzue.dialogx.style:DialogXMaterialYouStyle:0.0.48"
 
     const val gsyVideoPlayer = "com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-java:${Versions.gsyVideoPlayer}"
 

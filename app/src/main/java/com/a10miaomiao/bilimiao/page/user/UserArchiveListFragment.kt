@@ -1,5 +1,6 @@
 package com.a10miaomiao.bilimiao.page.user
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.lifecycle.coroutineScope
 import androidx.navigation.NavType
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import bilibili.app.space.v1.SpaceOuterClass
@@ -20,10 +22,12 @@ import cn.a10miaomiao.miao.binding.android.view._topPadding
 import com.a10miaomiao.bilimiao.MainNavGraph
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.*
+import com.a10miaomiao.bilimiao.comm.entity.archive.ArchiveInfo
 import com.a10miaomiao.bilimiao.comm.entity.video.SubmitVideosInfo
 import com.a10miaomiao.bilimiao.comm.mypage.*
 import com.a10miaomiao.bilimiao.comm.navigation.FragmentNavigatorBuilder
 import com.a10miaomiao.bilimiao.comm.navigation.MainNavArgs
+import com.a10miaomiao.bilimiao.comm.navigation.openSearchDrawer
 import com.a10miaomiao.bilimiao.comm.recycler.GridAutofitLayoutManager
 import com.a10miaomiao.bilimiao.comm.recycler._miaoAdapter
 import com.a10miaomiao.bilimiao.comm.recycler._miaoLayoutManage
@@ -35,6 +39,7 @@ import com.a10miaomiao.bilimiao.commponents.video.videoItem
 import com.a10miaomiao.bilimiao.config.config
 import com.a10miaomiao.bilimiao.page.video.VideoInfoFragment
 import com.a10miaomiao.bilimiao.store.WindowStore
+import com.a10miaomiao.bilimiao.widget.comm.getScaffoldView
 import com.a10miaomiao.bilimiao.widget.menu.CheckPopupMenu
 import com.chad.library.adapter.base.listener.OnItemClickListener
 import kotlinx.coroutines.launch
@@ -73,18 +78,28 @@ class UserArchiveListFragment : Fragment(), DIAware, MyPage {
     }
 
     override val pageConfig = myPageConfig {
+        var searchTitle = "搜索"
         title = "${viewModel.name}\n的\n投稿列表"
         menus = listOf(
+            myMenuItem {
+                key = MenuKeys.search
+                title = searchTitle
+                iconResource = R.drawable.ic_search_gray
+            },
             myMenuItem {
                 key = MenuKeys.filter
                 title = viewModel.rankOrder.title
                 iconResource = R.drawable.ic_baseline_filter_list_grey_24
             },
-            myMenuItem {
-                key = MenuKeys.region
-                title = viewModel.region.title
-                iconResource = R.drawable.ic_baseline_grid_on_gray_24
-            },
+//            myMenuItem {
+//                key = MenuKeys.region
+//                title = viewModel.region.title
+//                iconResource = R.drawable.ic_baseline_grid_on_gray_24
+//            },
+        )
+        search = SearchConfigInfo(
+            name = "搜索投稿列表",
+            keyword = "",
         )
     }
 
@@ -118,7 +133,21 @@ class UserArchiveListFragment : Fragment(), DIAware, MyPage {
                 }
                 pm.show()
             }
+            MenuKeys.search -> {
+                requireActivity().getScaffoldView().openSearchDrawer()
+            }
         }
+    }
+
+    override fun onSearchSelfPage(context: Context, keyword: String) {
+        findNavController().navigate(
+            UserSearchArchiveListFragment.actionId,
+            UserSearchArchiveListFragment.createArguments(
+                viewModel.id,
+                viewModel.name ?: "",
+                keyword,
+            )
+        )
     }
 
     override val di: DI by lazyUiDi(ui = { ui }) {
@@ -150,18 +179,18 @@ class UserArchiveListFragment : Fragment(), DIAware, MyPage {
 
     private val handleItemClick = OnItemClickListener { adapter, view, position ->
         val item = viewModel.list.data[position]
-        val args = VideoInfoFragment.createArguments(item.aid)
+        val args = VideoInfoFragment.createArguments(item.param)
         Navigation.findNavController(view)
             .navigate(VideoInfoFragment.actionId, args)
     }
 
-    val itemUi = miaoBindingItemUi<SubmitVideosInfo.DataBean> { item, index ->
+    val itemUi = miaoBindingItemUi<ArchiveInfo> { item, index ->
         videoItem (
             title = item.title,
-            pic = item.pic,
-            remark = NumberUtil.converCTime(item.created),
+            pic = item.cover,
+            remark = NumberUtil.converCTime(item.ctime),
             playNum = item.play,
-            damukuNum = item.video_review,
+            damukuNum = item.danmaku,
         )
     }
 

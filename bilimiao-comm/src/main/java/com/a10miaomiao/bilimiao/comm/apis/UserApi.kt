@@ -65,7 +65,7 @@ class UserApi {
         pageSize: Int,
         keyword: String = "",
         order: String = "pubdate",
-        ) = MiaoHttp.request {
+    ) = MiaoHttp.request {
         url = BiliApiService.biliApp(
             "x/v2/space/archive/cursor",
             "vmid" to vmid,
@@ -93,10 +93,15 @@ class UserApi {
 
     fun favFolderList(
         up_mid: String,
+        pageNum: Int,
+        pageSize: Int,
     ) = MiaoHttp.request {
+        // 用户空间 x/v3/fav/folder/space/v2
         url = BiliApiService.biliApi(
-            "x/v3/fav/folder/space/v2",
-            "up_mid" to up_mid
+            "x/v3/fav/folder/created/list",
+            "up_mid" to up_mid,
+            "pn" to pageNum.toString(),
+            "ps" to pageSize.toString(),
         )
     }
 
@@ -197,8 +202,7 @@ class UserApi {
         mid: String,
         pageNum: Int = 1,
         pageSize: Int = 30,
-        keyword: String = "",
-        order: String = "attention"
+        order: String = "attention" // 最常访问排列：attention，关注顺序排列：留空
     ) = MiaoHttp.request {
         url = BiliApiService.biliApi(
             "x/relation/followings",
@@ -210,4 +214,25 @@ class UserApi {
         )
     }
 
+    /**
+     * 关注分组
+     */
+    fun relationTags() = MiaoHttp.request {
+        url = BiliApiService.biliApi("x/relation/tags")
+    }
+
+    fun relationTagDetail(
+        tagid: String, // 特别关注恒为-10,默认分组恒为0
+        order: String = "attention", // 最常访问排列：attention，关注顺序排列：留空
+        pageNum: Int = 1,
+        pageSize: Int = 30,
+    ) = MiaoHttp.request {
+        url = BiliApiService.biliApi("x/relation/tag",
+            "tagid" to tagid,
+            "pn" to pageNum.toString(),
+            "ps" to pageSize.toString(),
+            "order_type" to order,
+            "order" to "desc",
+        )
+    }
 }
