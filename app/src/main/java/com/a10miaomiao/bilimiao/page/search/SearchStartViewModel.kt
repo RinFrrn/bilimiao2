@@ -10,11 +10,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import com.a10miaomiao.bilimiao.MainActivity
 import com.a10miaomiao.bilimiao.MainNavGraph
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.MiaoBindingUi
 import com.a10miaomiao.bilimiao.comm.db.SearchHistoryDB
+import com.a10miaomiao.bilimiao.comm.navigation.MainNavArgs
 import com.a10miaomiao.bilimiao.comm.network.BiliApiService
+import com.a10miaomiao.bilimiao.widget.comm.getScaffoldView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONException
@@ -34,6 +37,8 @@ class SearchStartViewModel (
 
     var historyList = mutableListOf<String>()
     var suggestList = mutableListOf<SuggestInfo>()
+
+    var searchMode = 0 // 0为全站搜索，1为页面自身搜索
 
     private val searchHistoryDB = SearchHistoryDB(activity, SearchHistoryDB.DB_NAME, null, 1)
 
@@ -114,10 +119,16 @@ class SearchStartViewModel (
         }
         searchHistoryDB.deleteHistory(keyword)
         searchHistoryDB.insertHistory(keyword)
-        Navigation.findNavController(view).popBackStack()
-        val nav = activity.findNavController(R.id.nav_host_fragment)
-        val args = SearchResultFragment.createArguments(keyword)
-        nav.navigate(SearchResultFragment.actionId, args)
+        activity.getScaffoldView().closeDrawer()
+        if (searchMode == 0) {
+            val nav = activity.findNavController(R.id.nav_host_fragment)
+            val args = bundleOf(
+                MainNavArgs.text to keyword
+            )
+            nav.navigate(SearchResultFragment.actionId, args)
+        } else {
+            (activity as? MainActivity)?.searchSelfPage(keyword)
+        }
     }
 
     fun deleteSearchHistory(text: String){
