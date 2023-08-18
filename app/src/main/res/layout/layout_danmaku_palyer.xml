@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -83,7 +84,8 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:paddingRight="8dp"
-                android:src="@drawable/ic_player_portrait_fullscreen" />
+                android:src="@drawable/ic_player_portrait_fullscreen"
+                app:tint="@color/white" />
 
         </LinearLayout>
 
@@ -217,10 +219,9 @@
         android:layout_above="@id/layout_bottom"
         android:layout_centerHorizontal="true"
         android:layout_margin="5dp"
-        android:padding="5dp"
         android:gravity="center"
-        android:textSize="16sp"
-        />
+        android:padding="5dp"
+        android:textSize="16sp" />
 
     <ProgressBar
         android:id="@+id/bottom_progressbar"
@@ -259,7 +260,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ellipsize="end"
-            android:maxLines="2"
+            android:maxLines="1"
             android:paddingLeft="10dp"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
@@ -268,27 +269,27 @@
             android:id="@+id/play_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:layout_marginHorizontal="10dp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:gravity="center"
             android:orientation="horizontal">
 
             <TextView
-                android:visibility="gone"
                 android:id="@+id/play_speed_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="倍速："
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/play_speed_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:letterSpacing="0.1"
                 android:text="1.0×"
                 android:textColor="@android:color/white"
-                android:letterSpacing="0.1"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -370,8 +371,8 @@
         android:id="@+id/drag_bar"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:src="@drawable/shape_small_drag_bar"
         android:scaleType="center"
-        android:visibility="gone"/>
+        android:src="@drawable/shape_small_drag_bar"
+        android:visibility="gone" />
 
 </RelativeLayout>

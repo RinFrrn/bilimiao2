@@ -5,15 +5,18 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
+import android.os.VibrationEffect
 import android.preference.PreferenceManager
 import android.util.Rational
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.navigation.findNavController
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.delegate.helper.StatusBarHelper
+import com.a10miaomiao.bilimiao.comm.dialogx.showTop
 import com.a10miaomiao.bilimiao.comm.store.UserStore
 import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
 import com.a10miaomiao.bilimiao.config.config
@@ -22,6 +25,8 @@ import com.a10miaomiao.bilimiao.service.PlayerService
 import com.a10miaomiao.bilimiao.widget.comm.ScaffoldView
 import com.a10miaomiao.bilimiao.widget.player.DanmakuVideoPlayer
 import com.a10miaomiao.bilimiao.widget.player.VideoPlayerCallBack
+import com.duzhaokun123.bilibilihd2.utils.GestureRecognizer
+import com.duzhaokun123.bilibilihd2.utils.VibratorUtil
 import com.kongzue.dialogx.dialogs.PopTip
 import com.shuyu.gsyvideoplayer.listener.GSYVideoProgressListener
 import master.flame.danmaku.danmaku.model.BaseDanmaku
@@ -77,6 +82,51 @@ class PlayerController(
         videoPlayerCallBack = that
         setGSYVideoProgressListener(that)
         updatePlayerMode(activity.resources.configuration)
+
+        setGestureListener(object : GestureRecognizer.OnGestureListener {
+            var longPressingPopTip: PopTip? = null
+            val vibratorUtil = VibratorUtil(this@PlayerController.activity)
+
+            override fun onLongPress(e: MotionEvent) {
+                when (e.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        val targetSpeed = if (speed < 2.0f) 2.0f else 1.0f  // 2倍速，当前>=2倍则设为1倍
+
+                        views.videoPlayer.setSpeed(targetSpeed, true)
+                        vibratorUtil.vibrate(VibrationEffect.EFFECT_CLICK)
+                        longPressingPopTip = PopTip.show("${targetSpeed.toInt()}×").showTop().showAlways()
+                    }
+                    else -> {
+                        val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
+                        val defaultSpeed = prefs.getFloat("player_speed", 1f)
+
+                        views.videoPlayer.setSpeed(defaultSpeed, true)
+                        vibratorUtil.vibrate(VibrationEffect.EFFECT_TICK)
+                        longPressingPopTip?.hide()
+                    }
+                }
+            }
+            override fun onSwipe(direction: GestureRecognizer.SwipeDirection) {
+                when (direction) {
+                    GestureRecognizer.SwipeDirection.UP -> if (scaffoldApp.fullScreenPlayer.not()) {
+                        fullScreen(getFullMode())
+                        vibratorUtil.vibrate(VibrationEffect.EFFECT_TICK)
+//                        PopTip.show(R.drawable.ic_player_portrait_fullscreen, "进入全屏").showTop()
+//                            .autoDismiss(600)
+                    }
+                    GestureRecognizer.SwipeDirection.DOWN -> if (scaffoldApp.fullScreenPlayer) {
+                        smallScreen()
+                        vibratorUtil.vibrate(VibrationEffect.EFFECT_TICK)
+//                        PopTip.show(R.drawable.ic_close_fullscreen_24, "退出全屏").showTop()
+//                            .autoDismiss(600)
+                    } else {
+                        enterPiP()
+                    }
+                    GestureRecognizer.SwipeDirection.LEFT -> {}
+                    GestureRecognizer.SwipeDirection.RIGHT -> {}
+                }
+            }
+        })
     }
 
     /**
@@ -265,27 +315,31 @@ class PlayerController(
         popupMenu.show()
     }
 
+    fun enterPiP() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val height = playerSourceInfo?.height
+            val width = playerSourceInfo?.width
+            // 设置宽高比例值
+            val aspectRatio = if (height == null || width == null) {
+                Rational(16, 9)
+            } else {
+                Rational(width, height)
+            }
+            try {
+                delegate.picInPicHelper?.enterPictureInPictureMode(aspectRatio)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                PopTip.show("此设备不支持小窗播放")
+            }
+        } else {
+            PopTip.show("小窗播放功能需要安卓8.0及以上版本")
+        }
+    }
+
     private fun moreMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.mini_window -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val height = playerSourceInfo?.height
-                    val width = playerSourceInfo?.width
-                    // 设置宽高比例值
-                    var aspectRatio = if (height == null || width == null) {
-                        Rational(16, 9)
-                    } else {
-                        Rational(width, height)
-                    }
-                    try {
-                        delegate.picInPicHelper?.enterPictureInPictureMode(aspectRatio)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        PopTip.show("此设备不支持小窗播放")
-                    }
-                } else {
-                    PopTip.show("小窗播放功能需要安卓8.0及以上版本")
-                }
+                enterPiP()
             }
             R.id.video_setting -> {
                 val nav = activity.findNavController(R.id.nav_bottom_sheet_fragment)
@@ -332,6 +386,8 @@ class PlayerController(
     override fun onAutoCompletion() {
         delegate.completionBoxController.show()
         delegate.historyReport()
+
+        if (scaffoldApp.fullScreenPlayer) smallScreen()
     }
 
     override fun onVideoPause() {

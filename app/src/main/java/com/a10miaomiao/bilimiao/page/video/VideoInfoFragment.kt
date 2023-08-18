@@ -131,7 +131,8 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
             },
             myMenuItem {
                 key = 1
-                iconResource = R.drawable.ic_column_comm
+//                iconResource = R.drawable.ic_column_comm
+                iconResource = R.drawable.ic_comment_reply
                 title = NumberUtil.converString(info?.stat?.reply?.toString() ?: "评论")
             },
 //            myMenuItem {

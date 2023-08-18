@@ -5,18 +5,17 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.media.AudioManager
 import android.os.Build
 import android.util.AttributeSet
 import android.view.*
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
+import androidx.transition.*
 import com.a10miaomiao.bilimiao.R
+import com.a10miaomiao.bilimiao.comm.CustomPathInterpolator
 import com.a10miaomiao.bilimiao.comm.delegate.helper.StatusBarHelper
 import com.a10miaomiao.bilimiao.config.config
 import com.a10miaomiao.bilimiao.widget.menu.CheckPopupMenu
+import com.duzhaokun123.bilibilihd2.utils.GestureRecognizer
 import com.shuyu.gsyvideoplayer.utils.CommonUtil
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
 import master.flame.danmaku.controller.DrawHandler
@@ -105,6 +104,8 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
 
     // 右边解锁按钮
     private val mUnlockRightIV: ImageView by lazy { findViewById(R.id.unlock_right) }
+
+    private val mFullScreenIV: ImageView by lazy { findViewById(R.id.fullscreen) }
 
     // 弹幕时间与播放器时间同步
     private val mDanmakuTime = object : DanmakuTimer() {
@@ -201,6 +202,8 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
     val speedValueTextView: View get() = mPlaySpeedValue
     val moreBtn: View get() = mMoreBtn
 
+    private var mGestureRecognizer: GestureRecognizer? = null
+
     // 是否处于锁定状态
     var isLock: Boolean = false
         set(value) {
@@ -269,28 +272,59 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
         mLockContainer.setOnClickListener(lockClickListener)
         mUnlockLeftIV.setOnClickListener(lockClickListener)
         mUnlockRightIV.setOnClickListener(lockClickListener)
-
-        // FIXME: 无效
-        isShowFullAnimation = true
-//        isReleaseWhenLossAudio
     }
+
+    public fun setGestureListener(listener: GestureRecognizer.OnGestureListener) {
+        mGestureRecognizer = GestureRecognizer(context, listener)
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+        mGestureRecognizer?.onTouchEvent(ev)  // 避免手势冲突
+        return false
+    }
+
+    override fun onClickUiToggle(e: MotionEvent?) {
+        val set = TransitionSet().addTransition(Fade().apply {
+            duration = 200
+            interpolator = CustomPathInterpolator.SheetCurve
+        }).addTransition(ChangeBounds().apply {
+            duration = 200
+            interpolator = CustomPathInterpolator.SmoothCurve
+        })
+        TransitionManager.beginDelayedTransition(this, set)
+
+//        TransitionManager.beginDelayedTransition(mTopContainer, Slide(Gravity.TOP).apply {
+//            duration = 400
+//            interpolator = CustomPathInterpolator.SheetCurve
+//        })
+//        TransitionManager.beginDelayedTransition(mBottomContainer, Slide(Gravity.BOTTOM).apply {
+//            duration = 400
+//            interpolator = CustomPathInterpolator.SheetCurve
+//        })
+        super.onClickUiToggle(e)
+    }
+
+
+
     private fun updateMode() {
         when (mode) {
             PlayerMode.SMALL_TOP, PlayerMode.SMALL_FLOAT -> {
                 mFullModeBottomContainer.visibility = GONE
                 mPlaySpeedName.visibility = GONE
-                mBackButton.setImageResource(R.drawable.video_small_close)
+                mBackButton.setImageResource(R.drawable.ic_close_white_24dp)
                 if (mode == PlayerMode.SMALL_FLOAT) {
                     mDragBar.visibility = mTopContainer.visibility
                 } else {
                     mDragBar.visibility = GONE
                 }
+                mFullScreenIV.visibility = VISIBLE
             }
             PlayerMode.FULL -> {
                 mFullModeBottomContainer.visibility = VISIBLE
                 mPlaySpeedName.visibility = VISIBLE
-                mBackButton.setImageResource(R.drawable.bili_player_back_button)
+                mBackButton.setImageResource(R.drawable.ic_arrow_back_white_24dp)
                 mDragBar.visibility = GONE
+                mFullScreenIV.visibility = GONE
             }
         }
     }
@@ -715,7 +749,7 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
         val content: String,
     )
 
-    // TODO: 改变进度调整幅度为绝对时间
+    // 改变进度调整幅度为绝对时间
     override fun touchSurfaceMove(deltaX: Float, deltaY: Float, y: Float) {
         var curWidth = 0
         var curHeight = 0

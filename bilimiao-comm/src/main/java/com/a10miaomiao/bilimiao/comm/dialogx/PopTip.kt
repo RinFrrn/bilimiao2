@@ -10,7 +10,7 @@ fun PopTip.showTop(): PopTip {
         it.addRule(RelativeLayout.ALIGN_PARENT_TOP)
         it.setMargins(
             it.leftMargin,
-            dip2px(100f),
+            dip2px(48f),
             it.rightMargin,
             0
         )
