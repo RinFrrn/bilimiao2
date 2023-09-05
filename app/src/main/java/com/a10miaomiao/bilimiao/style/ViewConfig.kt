@@ -23,7 +23,11 @@ class ViewConfig(val context: Context) {
 
     val white80 get() = 0xAAFFFFFF.toInt()
 
+    val white get() = 0xFFFFFFFF.toInt()
+
     val themeName get() = context.resources.getString(context.attr(R.attr.themeName))
+
+    val videoCardTextBackground get() = R.drawable.bg_black_gradient//context.attr(R.drawable.bg_black_gradient)
 
     val colorSurfaceResource get() = context.attr(com.google.android.material.R.attr.colorSurface)
     val colorSurface get() = context.resources.getColor(colorSurfaceResource)

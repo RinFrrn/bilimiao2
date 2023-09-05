@@ -1,14 +1,18 @@
 package com.a10miaomiao.bilimiao.page.home
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.marginStart
+import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import cn.a10miaomiao.miao.binding.android.view._backgroundColor
 import cn.a10miaomiao.miao.binding.android.view._bottomPadding
 import com.a10miaomiao.bilimiao.MainNavGraph
 import com.a10miaomiao.bilimiao.comm.*
@@ -20,6 +24,7 @@ import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
 import com.a10miaomiao.bilimiao.commponents.loading.ListState
 import com.a10miaomiao.bilimiao.commponents.loading.listStateView
 import com.a10miaomiao.bilimiao.commponents.video.videoItem
+import com.a10miaomiao.bilimiao.commponents.video.videoItemV
 import com.a10miaomiao.bilimiao.config.config
 import com.a10miaomiao.bilimiao.page.video.VideoInfoFragment
 import com.a10miaomiao.bilimiao.store.WindowStore
@@ -31,9 +36,11 @@ import org.kodein.di.instance
 import splitties.dimensions.dip
 import splitties.views.backgroundColor
 import splitties.views.dsl.core.*
+import splitties.views.dsl.material.materialCardView
 import splitties.views.dsl.recyclerview.recyclerView
+import splitties.views.padding
 
-class RecommendFragment: RecyclerViewFragment(), DIAware {
+class RecommendFragment : RecyclerViewFragment(), DIAware {
 
     companion object {
         fun newFragmentInstance(): RecommendFragment {
@@ -87,15 +94,27 @@ class RecommendFragment: RecyclerViewFragment(), DIAware {
     }
 
     val itemUi = miaoBindingItemUi<RecommendCardInfo> { item, index ->
-        videoItem (
-            title = item.title,
-            pic =item.cover,
-            upperName = item.args.up_name,
-            playNum = item.cover_left_text_1,
-            damukuNum = item.cover_left_text_2,
-        )
+        materialCardView {
+            strokeWidth = 0
+            elevation = 2f
+            radius = 12f
+            setCardBackgroundColor(config.blockBackgroundColor)
+            layoutParams =
+                ViewGroup.MarginLayoutParams(matchParent, wrapContent)
+                    .apply { setMargins(dip(3), dip(3), dip(3), dip(3)) }
+
+            views {
+                +videoItemV(
+                    title = item.title,
+                    pic = item.cover,
+                    upperName = item.args.up_name,
+                    playNum = item.cover_left_text_1,
+                    damukuNum = item.cover_left_text_2,
+                )
+            }
+        }
     }
-    
+
     val ui = miaoBindingUi {
         val windowStore = miaoStore<WindowStore>(viewLifecycleOwner, di)
         val contentInsets = windowStore.getContentInsets(parentView)
@@ -110,14 +129,15 @@ class RecommendFragment: RecyclerViewFragment(), DIAware {
                 +recyclerviewAtViewPager2 {
                     backgroundColor = config.windowBackgroundColor
                     mLayoutManager = _miaoLayoutManage(
-                        GridAutofitLayoutManager(requireContext(), requireContext().dip(300))
+                        GridAutofitLayoutManager(requireContext(), requireContext().dip(190))
                     )
 
                     val mAdapter = _miaoAdapter(
                         items = viewModel.list.data,
                         itemUi = itemUi,
                     ) {
-                        stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                        stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                         setOnItemClickListener(handleItemClick)
                         loadMoreModule.setOnLoadMoreListener {
                             viewModel.loadMode()
