@@ -454,8 +454,8 @@ class UserFragment : Fragment(), DIAware, MyPage {
         return verticalLayout {
             padding = dip(5)
             setBackgroundResource(config.selectableItemBackground)
-
             views {
+                // TODO: more info
                 +rcImageView {
                     radius = dip(5)
                     scaleType = ImageView.ScaleType.FIT_CENTER

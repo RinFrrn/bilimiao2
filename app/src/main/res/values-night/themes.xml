@@ -18,6 +18,8 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
 
         <item name="blockBackground">@color/darkBlockBackgroundColor</item>
         <item name="foregroundColor">@color/darkForegroundColor</item>

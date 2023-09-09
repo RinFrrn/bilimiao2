@@ -94,25 +94,14 @@ class RecommendFragment : RecyclerViewFragment(), DIAware {
     }
 
     val itemUi = miaoBindingItemUi<RecommendCardInfo> { item, index ->
-        materialCardView {
-            strokeWidth = 0
-            elevation = 2f
-            radius = 12f
-            setCardBackgroundColor(config.blockBackgroundColor)
-            layoutParams =
-                ViewGroup.MarginLayoutParams(matchParent, wrapContent)
-                    .apply { setMargins(dip(3), dip(3), dip(3), dip(3)) }
 
-            views {
-                +videoItemV(
-                    title = item.title,
-                    pic = item.cover,
-                    upperName = item.args.up_name,
-                    playNum = item.cover_left_text_1,
-                    damukuNum = item.cover_left_text_2,
-                )
-            }
-        }
+        videoItemV(
+            title = item.title,
+            pic = item.cover,
+            upperName = item.args.up_name,
+            playNum = item.cover_left_text_1,
+            damukuNum = item.cover_left_text_2,
+        )
     }
 
     val ui = miaoBindingUi {
@@ -129,7 +118,7 @@ class RecommendFragment : RecyclerViewFragment(), DIAware {
                 +recyclerviewAtViewPager2 {
                     backgroundColor = config.windowBackgroundColor
                     mLayoutManager = _miaoLayoutManage(
-                        GridAutofitLayoutManager(requireContext(), requireContext().dip(190))
+                        GridAutofitLayoutManager(requireContext(), requireContext().dip(180))
                     )
 
                     val mAdapter = _miaoAdapter(

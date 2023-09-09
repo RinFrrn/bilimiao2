@@ -188,6 +188,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                 pm.show()
             }
             1 -> {
+                // TODO: move to tab
                 // 评论
                 if (info != null) {
                     val nav = requireActivity().findNavController(R.id.nav_host_fragment)
@@ -821,6 +822,8 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                 }
             }
         }
+
+        // TODO: add tab
         recyclerView {
             _leftPadding = contentInsets.left
             _rightPadding = contentInsets.right
