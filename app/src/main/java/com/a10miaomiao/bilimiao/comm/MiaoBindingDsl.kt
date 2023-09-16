@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import splitties.views.imageDrawable
 import splitties.views.imageResource
 
@@ -51,7 +52,8 @@ fun ImageView._network(
             .loadImageUrl(url, suffix)
             .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .placeholder(R.drawable.bili_default_image_tv)
+            .transition(withCrossFade(200))
+//            .placeholder(R.drawable.bili_default_image_tv)
             .dontAnimate()
             .into(this)
     } else {

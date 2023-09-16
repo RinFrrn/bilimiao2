@@ -221,7 +221,8 @@ class AppBarBehavior : CoordinatorLayout.Behavior<View> {
             .setDuration(duration)
             .setListener(
                 object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
+
+                    override fun onAnimationStart(animation: Animator) {
                         if (child is AppBarView) {
                             if (targetY == 0){
                                 child.showMenu()
@@ -229,6 +230,8 @@ class AppBarBehavior : CoordinatorLayout.Behavior<View> {
                                 child.hideMenu()
                             }
                         }
+                    }
+                    override fun onAnimationEnd(animation: Animator) {
                         currentAnimator = null
                     }
                 })

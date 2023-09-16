@@ -6,6 +6,7 @@ import androidx.annotation.StyleRes
 import androidx.viewpager2.widget.ViewPager2
 import com.a10miaomiao.bilimiao.widget.expandabletext.ExpandableTextView
 import com.a10miaomiao.bilimiao.widget.gridimage.NineGridImageView
+import com.a10miaomiao.bilimiao.widget.image.GlideLoadRationHeightImageView
 import com.a10miaomiao.bilimiao.widget.image.RCImageView
 import com.a10miaomiao.bilimiao.widget.layout.LimitedFrameLayout
 import com.a10miaomiao.bilimiao.widget.recycler.ViewPager2Container
@@ -13,6 +14,14 @@ import com.a10miaomiao.bilimiao.widget.picker.DatePickerView
 import com.a10miaomiao.bilimiao.widget.picker.MonthPickerView
 import com.a10miaomiao.bilimiao.widget.recycler.RecyclerviewAtViewPager2
 import splitties.views.dsl.core.*
+
+inline fun View.glideRationImageView(
+    @IdRes id: Int = View.NO_ID,
+    @StyleRes theme: Int = NO_THEME,
+    initView: GlideLoadRationHeightImageView.() -> Unit = {}
+): GlideLoadRationHeightImageView {
+    return view({ GlideLoadRationHeightImageView(it) }, id).apply(initView)
+}
 
 inline fun View.rcImageView(
     @IdRes id: Int = View.NO_ID,

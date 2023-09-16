@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
@@ -94,13 +95,21 @@ class RecommendFragment : RecyclerViewFragment(), DIAware {
     }
 
     val itemUi = miaoBindingItemUi<RecommendCardInfo> { item, index ->
+//        println(item)
+        //card_type=small_cover_v2, card_goto=av, goto=av, ... cover_right_text=1:52, cover_right_content_description=1分钟52秒
+        //card_type=cm_v2, card_goto=ad_av, goto=av
+        //card_type=small_cover_v2, card_goto=live, goto=live, ... cover_right_text=真的想不出名儿了, cover_right_content_description=真的想不出名儿了
+        val isLive = item.card_goto == "live"
 
+        println(listOf("itemUi", index, isLive, item.title, item.cover_left_text_1))
         videoItemV(
             title = item.title,
             pic = item.cover,
             upperName = item.args.up_name,
             playNum = item.cover_left_text_1,
             damukuNum = item.cover_left_text_2,
+            duration = if (isLive) null else item.cover_right_text,
+            isLive = isLive
         )
     }
 
@@ -117,9 +126,14 @@ class RecommendFragment : RecyclerViewFragment(), DIAware {
             views {
                 +recyclerviewAtViewPager2 {
                     backgroundColor = config.windowBackgroundColor
+
+                    val maxItemWidth = dip(200)
                     mLayoutManager = _miaoLayoutManage(
-                        GridAutofitLayoutManager(requireContext(), requireContext().dip(180))
+                        GridAutofitLayoutManager(requireContext(), maxItemWidth)
                     )
+
+                    clipToPadding = false
+                    setPadding(dip(4))
 
                     val mAdapter = _miaoAdapter(
                         items = viewModel.list.data,

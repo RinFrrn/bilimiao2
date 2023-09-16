@@ -7,21 +7,26 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.marginBottom
 import cn.a10miaomiao.miao.binding.android.view._show
+import cn.a10miaomiao.miao.binding.android.view._visibility
 import cn.a10miaomiao.miao.binding.android.widget._text
 import cn.a10miaomiao.miao.binding.miaoEffect
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.MiaoUI
 import com.a10miaomiao.bilimiao.comm._network
+import com.a10miaomiao.bilimiao.comm.attr
 import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
 import com.a10miaomiao.bilimiao.comm.utils.HtmlTagHandler
 import com.a10miaomiao.bilimiao.comm.utils.NumberUtil
 import com.a10miaomiao.bilimiao.comm.views
 import com.a10miaomiao.bilimiao.config.ViewStyle
 import com.a10miaomiao.bilimiao.config.config
+import com.a10miaomiao.bilimiao.widget.glideRationImageView
 import com.a10miaomiao.bilimiao.widget.rcImageView
 import splitties.dimensions.dip
 import splitties.resources.color
+import splitties.views.bottomPadding
 import splitties.views.dsl.constraintlayout.bottomOfParent
 import splitties.views.dsl.core.*
 import splitties.views.dsl.constraintlayout.constraintLayout
@@ -33,6 +38,7 @@ import splitties.views.dsl.constraintlayout.startOfParent
 import splitties.views.dsl.constraintlayout.topOfParent
 import splitties.views.dsl.material.materialCardView
 import splitties.views.imageResource
+import splitties.views.lines
 import splitties.views.padding
 
 fun MiaoUI.videoItem(
@@ -126,7 +132,8 @@ fun MiaoUI.videoItem(
 
                         views {
                             +imageView {
-                                imageResource = R.drawable.ic_play_circle_outline_black_24dp
+                                imageResource = R.drawable.ic_info_views//R.drawable.ic_play_circle_outline_black_24dp
+                                imageTintList = ColorStateList.valueOf(config.foregroundAlpha45Color)
                             }..lParams {
                                 width = dip(16)
                                 rightMargin = dip(3)
@@ -138,7 +145,8 @@ fun MiaoUI.videoItem(
                             }
                             +space()..lParams(width = dip(10))
                             +imageView {
-                                imageResource = R.drawable.ic_subtitles_black_24dp
+                                imageResource = R.drawable.ic_info_danmakus//R.drawable.ic_subtitles_black_24dp
+                                imageTintList = ColorStateList.valueOf(config.foregroundAlpha45Color)
                             }..lParams {
                                 width = dip(16)
                                 rightMargin = dip(3)
@@ -168,7 +176,9 @@ fun MiaoUI.videoItemV(
     remark: String? = null,
     playNum: String? = null,
     damukuNum: String? = null,
-    isHtml: Boolean = false,
+    duration: String? = null,
+    isLive: Boolean = false,
+    isHtml: Boolean = false
 ): View {
     return materialCardView {
         strokeWidth = 0
@@ -177,11 +187,11 @@ fun MiaoUI.videoItemV(
         setCardBackgroundColor(config.blockBackgroundColor)
         layoutParams =
             ViewGroup.MarginLayoutParams(matchParent, wrapContent)
-                .apply { setMargins(dip(3), dip(3), dip(3), dip(3)) }
+                .apply { setMargins(dip(3), dip(4), dip(3), dip(3)) }
 
         views {
             +verticalLayout {
-                layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
+                layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
 //        setBackgroundResource(config.selectableItemBackground)
 //        padding = dip(10)
 
@@ -190,8 +200,17 @@ fun MiaoUI.videoItemV(
                     +constraintLayout {
                         views {
                             // 封面
+//                            +glideRationImageView {
+////                                setImageUrl(pic)
+//                                _network(pic, "@672w_378h_1c_")
+//                                ration = 3f / 5f
+//                            }..lParams(matchParent, dip(0)) {
+//                                topOfParent()
+//                                startOfParent()
+//                                endOfParent()
+////                                dimensionRatio = "5:3"
+//                            }
                             +rcImageView {
-//                        radius = dip(5)
                                 scaleType = ImageView.ScaleType.CENTER_CROP
                                 _network(pic, "@672w_378h_1c_")
                             }..lParams(matchParent, dip(0)) {
@@ -200,6 +219,23 @@ fun MiaoUI.videoItemV(
                                 endOfParent()
 //                                dimensionRatio = "8:5"
                                 dimensionRatio = "5:3"
+                            }
+
+                            +textView {
+                                text = "LIVE"//resources.getString(R.string.live) //"直播"
+                                lines = 1
+                                textSize = 10f
+                                alpha = 0.9f
+                                setTextColor(config.white)
+                                setPadding(dip(4), dip(1), dip(4), dip(2))
+                                setBackgroundResource(config.videoCardLiveBackground)
+                                backgroundTintList = ColorStateList.valueOf(config.themeColor)
+
+                                _show = isLive
+
+                            }..lParams(wrapContent, wrapContent) {
+                                topOfParent(dip(6))
+                                endOfParent(dip(8))
                             }
 
                             // 播放量，弹幕数量
@@ -211,10 +247,11 @@ fun MiaoUI.videoItemV(
 
                                 views {
                                     +imageView {
-                                        imageResource = R.drawable.ic_play_circle_outline_black_24dp
+                                        imageResource = R.drawable.ic_video_plays//R.drawable.ic_play_circle_outline_black_24dp
                                         imageTintList = ColorStateList.valueOf(config.white)
                                     }..lParams {
-                                        width = dip(12)
+                                        width = dip(16)
+                                        topMargin = 2
                                         rightMargin = dip(3)
                                     }
                                     +textView {
@@ -222,18 +259,32 @@ fun MiaoUI.videoItemV(
                                         setTextColor(config.white)
                                         _text = NumberUtil.converString(playNum ?: "0")
                                     }
+
                                     +space()..lParams(width = dip(10))
                                     +imageView {
-                                        imageResource = R.drawable.ic_subtitles_black_24dp
+                                        imageResource = R.drawable.ic_video_danmus//R.drawable.ic_subtitles_black_24dp
                                         imageTintList = ColorStateList.valueOf(config.white)
+
+                                        _show = damukuNum != null
+
                                     }..lParams {
-                                        width = dip(12)
+                                        width = dip(16)
+                                        topMargin = 2
                                         rightMargin = dip(3)
                                     }
                                     +textView {
                                         textSize = 12f
                                         setTextColor(config.white)
                                         _text = NumberUtil.converString(damukuNum ?: "0")
+
+                                        _show = damukuNum != null
+                                    }
+
+                                    +space()..lParams { weight = 1f }
+                                    +textView {
+                                        textSize = 12f
+                                        setTextColor(config.white)
+                                        _text = duration ?: ""
                                     }
                                 }
                             }..lParams(matchParent, wrapContent) {
@@ -251,8 +302,10 @@ fun MiaoUI.videoItemV(
 
                     +verticalLayout {
                         layoutParams =
-                            ViewGroup.MarginLayoutParams(matchParent, wrapContent)
-                                .apply { setMargins(dip(8), dip(6), dip(8), dip(2)) }
+                            ViewGroup.MarginLayoutParams(matchParent, matchParent)
+//                                .apply { setMargins(dip(8), dip(6), dip(8), dip(2)) }
+
+                        setPadding(dip(8), dip(6), dip(8), dip(4))
 
                         views {
                             // 标题
@@ -270,8 +323,11 @@ fun MiaoUI.videoItemV(
                                 } else {
                                     _text = title ?: ""
                                 }
+
+                                bottomPadding = dip(2)
                             }..lParams(matchParent, matchParent) {
                                 weight = 1f
+//                                marginBottom = dip(6)
                             }
 
                             // UP主
@@ -281,10 +337,12 @@ fun MiaoUI.videoItemV(
 
                                 views {
                                     +imageView {
-                                        imageResource = R.drawable.icon_up
-                                        apply(ViewStyle.roundRect(dip(5)))
+                                        imageResource = R.drawable.ic_video_up//R.drawable.icon_up
+                                        imageTintList = ColorStateList.valueOf(config.foregroundAlpha45Color)
+                                        //apply(ViewStyle.roundRect(dip(5)))
                                     }..lParams {
                                         width = dip(15)
+                                        topMargin = dip(1)
                                         rightMargin = dip(3)
                                     }
 
@@ -314,7 +372,6 @@ fun MiaoUI.videoItemV(
 
                         }
                     }
-
                 }
             }
         }

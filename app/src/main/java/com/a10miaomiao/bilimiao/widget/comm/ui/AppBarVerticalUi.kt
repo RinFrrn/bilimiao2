@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.a10miaomiao.bilimiao.comm.attr
 import com.a10miaomiao.bilimiao.comm.mypage.MenuItemPropInfo
 import com.a10miaomiao.bilimiao.comm.mypage.MenuKeys
@@ -178,6 +180,7 @@ class AppBarVerticalUi(
     ).apply {
         repeatMode = Animation.REVERSE
         duration = 200
+        interpolator = LinearOutSlowInInterpolator()
     }
 
     //向下位移隐藏动画  从自身位置的最上端向下滑动了自身的高度
@@ -193,6 +196,7 @@ class AppBarVerticalUi(
     ).apply {
         repeatMode = Animation.REVERSE
         duration = 200
+        interpolator = FastOutLinearInInterpolator()
     }
 
     fun showMenu() {
