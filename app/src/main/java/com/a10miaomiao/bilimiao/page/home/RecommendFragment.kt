@@ -101,7 +101,6 @@ class RecommendFragment : RecyclerViewFragment(), DIAware {
         //card_type=small_cover_v2, card_goto=live, goto=live, ... cover_right_text=真的想不出名儿了, cover_right_content_description=真的想不出名儿了
         val isLive = item.card_goto == "live"
 
-        println(listOf("itemUi", index, isLive, item.title, item.cover_left_text_1))
         videoItemV(
             title = item.title,
             pic = item.cover,

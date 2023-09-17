@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -88,6 +89,9 @@ class MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         themeDelegate.onCreate(savedInstanceState)
         ui = MainUi(this)
         setContentView(ui.root)
@@ -233,7 +237,7 @@ class MainActivity
             goBackHome()
         }
     }
-    
+
     val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when(intent?.action) {
