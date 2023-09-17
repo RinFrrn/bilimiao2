@@ -108,7 +108,8 @@ class MainActivity
                 insets
             }
             ui.root.onPlayerChanged = {
-                statusBarHelper.isLightStatusBar = !it || (ui.root.orientation == ScaffoldView.HORIZONTAL && !ui.root.fullScreenPlayer)
+                updateStatusBarColor()
+
                 setWindowInsets(ui.root.rootWindowInsets)
             }
         } else {
@@ -388,6 +389,17 @@ class MainActivity
         basePlayerDelegate.onStop()
     }
 
+    private fun updateStatusBarColor() {
+        val isVertical = ui.root.orientation == ScaffoldView.VERTICAL
+        val isDarkMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) this.resources.configuration.isNightModeActive else false
+        val isFullScreen = ui.root.fullScreenPlayer
+        val isPlayerVisible = ui.root.showPlayer
+
+        val isLightStatusBarText = isDarkMode or isFullScreen or (isPlayerVisible and isVertical)
+        
+        statusBarHelper.isLightStatusBar = isLightStatusBarText.not()
+    }
+
     /**
      * 通知权限设置界面跳转
      */
@@ -460,7 +472,9 @@ class MainActivity
         super.onConfigurationChanged(newConfig)
         basePlayerDelegate.onConfigurationChanged(newConfig)
         ui.root.orientation = newConfig.orientation
-        statusBarHelper.isLightStatusBar = !ui.root.showPlayer || (ui.root.orientation == ScaffoldView.HORIZONTAL && !ui.root.fullScreenPlayer)
+
+        updateStatusBarColor()
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             setWindowInsetsAndroidL()
         }

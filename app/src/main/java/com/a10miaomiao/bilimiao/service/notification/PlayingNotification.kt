@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory
 import android.media.session.PlaybackState
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationCompat
 import com.a10miaomiao.bilimiao.MainActivity
 import com.a10miaomiao.bilimiao.R
@@ -33,13 +34,20 @@ class PlayingNotification(
         const val ACTION_CMD_TOGGLE_PAUSE = "${PlayerService.BILIMIAO_PLAYER_PACKAGE_NAME}.PlayingNotification.cmd.togglepause"
         const val ACTION_CMD_CLOSE = "${PlayerService.BILIMIAO_PLAYER_PACKAGE_NAME}.PlayingNotification.cmd.close"
 
-        const val MEDIA_SESSION_ACTIONS = (PlaybackState.ACTION_PLAY
-                or PlaybackState.ACTION_PAUSE
-                or PlaybackState.ACTION_PLAY_PAUSE
-                or PlaybackState.ACTION_SKIP_TO_NEXT
-                or PlaybackState.ACTION_SKIP_TO_PREVIOUS
-                or PlaybackState.ACTION_STOP
-                or PlaybackState.ACTION_SEEK_TO)
+        const val MEDIA_SESSION_ACTIONS = (PlaybackStateCompat.ACTION_PLAY
+                or PlaybackStateCompat.ACTION_PAUSE
+                or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                or PlaybackStateCompat.ACTION_STOP
+                or PlaybackStateCompat.ACTION_SEEK_TO)
+//        const val MEDIA_SESSION_ACTIONS = (PlaybackState.ACTION_PLAY
+//                or PlaybackState.ACTION_PAUSE
+//                or PlaybackState.ACTION_PLAY_PAUSE
+//                or PlaybackState.ACTION_SKIP_TO_NEXT
+//                or PlaybackState.ACTION_SKIP_TO_PREVIOUS
+//                or PlaybackState.ACTION_STOP
+//                or PlaybackState.ACTION_SEEK_TO)
 
         const val NOTIFICATION_CONTROLS_SIZE_MULTIPLIER = 1.0f
         internal const val NOTIFICATION_CHANNEL_ID = "${PlayerService.BILIMIAO_PLAYER_PACKAGE_NAME}.playing_notification"
