@@ -6,6 +6,8 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.setMargins
+import cn.a10miaomiao.miao.binding.android.view._backgroundColor
+import cn.a10miaomiao.miao.binding.android.view._backgroundTintList
 import cn.a10miaomiao.miao.binding.android.view._show
 import cn.a10miaomiao.miao.binding.android.widget._text
 import cn.a10miaomiao.miao.binding.miaoEffect
@@ -212,7 +214,7 @@ fun MiaoUI.videoItemV(
                                 setTextColor(config.white)
                                 setPadding(dip(4), dip(1), dip(4), dip(2))
                                 setBackgroundResource(config.videoCardLiveBackground)
-                                backgroundTintList = ColorStateList.valueOf(config.themeColor)
+                                _backgroundTintList = ColorStateList.valueOf(config.themeColor)
 
                                 _show = isLive
 

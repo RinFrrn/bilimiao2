@@ -13,6 +13,7 @@ import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.a10miaomiao.bilimiao.widget.shadow.ShadowLayout
 import com.google.android.flexbox.FlexboxLayout
+import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.tabs.TabLayout
 import splitties.views.dsl.core.*
 import kotlin.contracts.InvocationKind
@@ -106,4 +107,10 @@ inline fun View.flexboxLayout(
     return view({ FlexboxLayout(it) }, id).apply(initView)
 }
 
-
+inline fun View.materialDivider(
+    @IdRes id: Int = View.NO_ID,
+    @StyleRes theme: Int = NO_THEME,
+    initView: MaterialDivider.() -> Unit = {}
+): MaterialDivider {
+    return view({ MaterialDivider(it) }, id).apply(initView)
+}

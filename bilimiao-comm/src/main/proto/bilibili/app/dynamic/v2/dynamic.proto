@@ -8,6 +8,7 @@ import "bilibili/app/dynamic/v2/common.proto";
 import "bilibili/app/dynamic/v2/module.proto";
 import "bilibili/app/dynamic/v2/video.proto";
 import "bilibili/app/dynamic/v2/other.proto";
+import "bilibili/app/dynamic/v2/author.proto";
 
 // v2动态
 service Dynamic {
@@ -283,4 +284,258 @@ message DynDetailReq {
     int32 local_time = 10;
     // pattern
     string pattern = 11;
+}
+
+// 综合页-无关注列表
+message Unfollow {
+    // 标题展示文案
+    string title = 1;
+    // 无关注列表
+    repeated UnfollowUserItem list = 2;
+    // trackID
+    string TrackId = 3;
+}
+
+// 综合页-无关注列表
+message UnfollowUserItem {
+    // 是否有更新
+    bool has_update = 1;
+    // up主头像
+    string face = 2;
+    // up主昵称
+    string name = 3;
+    // up主uid
+    int64 uid = 4;
+    // 排序字段 从1开始
+    int32 pos = 5;
+    // 直播状态
+    LiveState live_state = 6;
+    // 认证信息
+    OfficialVerify official = 7;
+    // 大会员信息
+    VipInfo vip = 8;
+    // up介绍
+    string sign = 9;
+    // 标签信息
+    string label = 10;
+    // 按钮
+    AdditionalButton button = 11;
+    // 跳转地址
+    string uri = 12;
+}
+
+// 批量动态id获取动态详情-请求
+message DynDetailsReq {
+    // 动态id
+    string dynamic_ids = 1;
+    // 秒开参数 新版本废弃，统一使用player_args
+    PlayurlParam playurl_param = 2;
+    // 客户端时区 兼容UTC-14和Etc/GMT+12,时区区间[-12,14] 东八区为8
+    int32 local_time = 3;
+    // 秒开参数
+    bilibili.app.archive.middleware.v1.PlayerArgs player_args = 4;
+}
+
+
+// 最近访问-个人feed流列表-请求
+message DynVideoPersonalReq {
+    // 被访问者的 UID
+    int64 host_uid = 1;
+    // 偏移量 第一页可传空
+    string offset = 2;
+    // 标明下拉几次
+    int32 page = 3;
+    // 是否是预加载
+    int32 is_preload = 4;
+    // 秒开参数 新版本废弃，统一使用player_args
+    PlayurlParam playurl_param = 5;
+    // 客户端时区 兼容UTC-14和Etc/GMT+12,时区区间[-12,14] 东八区为8
+    int32 local_time = 6;
+    // 服务端生成的透传上报字段
+    string footprint = 7;
+    // 来源
+    string from = 8;
+    // 秒开参数
+    bilibili.app.archive.middleware.v1.PlayerArgs player_args = 9;
+}
+
+// 最近访问-标记已读-请求
+message DynVideoUpdOffsetReq {
+    // 被访问者的UID
+    int64 host_uid = 1;
+    // 用户已读进度
+    string read_offset = 2;
+    // 服务端生成的透传上报字段
+    string footprint = 3;
+}
+
+// 视频页-最近访问
+message CardVideoUpList {
+    // 标题展示文案
+    string title = 1;
+    // up主列表
+    repeated UpListItem list = 2;
+    // 服务端生成的透传上报字段
+    string footprint = 3;
+    // 直播数
+    int32 show_live_num = 4;
+    // 跳转label
+    UpListMoreLabel more_label = 5;
+    // 标题开关(综合页)
+    int32 title_switch = 6;
+    // 是否展示右上角查看更多label
+    bool show_more_label = 7;
+    // 是否在快速消费页查看更多按钮
+    bool show_in_personal = 8;
+    // 是否展示右侧查看更多按钮
+    bool show_more_button = 9;
+}
+
+// 最常访问-查看更多
+message UpListMoreLabel {
+    // 文案
+    string title = 1;
+    // 跳转地址
+    string uri = 2;
+}
+
+// 动态顶部up列表-up主信息
+message UpListItem {
+    // 是否有更新
+    bool has_update = 1;
+    // up主头像
+    string face = 2;
+    // up主昵称
+    string name = 3;
+    // up主uid
+    int64 uid = 4;
+    // 排序字段 从1开始
+    int64 pos = 5;
+    // 用户类型
+    UserItemType user_item_type = 6;
+    // 直播头像样式-日
+    UserItemStyle display_style_day = 7;
+    // 直播头像样式-夜
+    UserItemStyle display_style_night = 8;
+    // 直播埋点
+    int64 style_id = 9;
+    // 直播状态
+    LiveState live_state = 10;
+    // 分割线
+    bool separator = 11;
+    // 跳转
+    string uri = 12;
+    // UP主预约上报使用
+    bool is_recall = 13;
+}
+
+
+// 动态通用附加卡-follow/取消follow-请求
+message DynAdditionCommonFollowReq {
+    //
+    AdditionalButtonStatus status = 1;
+    //
+    string dyn_id = 2;
+    //
+    string card_type = 3;
+}
+
+//
+enum FollowType {
+    //
+    ft_not_follow = 0;
+    //
+    ft_follow = 1;
+}
+
+// 动态通用附加卡-follow/取消follow-响应
+message DynAdditionCommonFollowReply {
+    //
+    AdditionalButtonStatus status = 1;
+}
+
+// 动态点赞-请求
+message DynThumbReq {
+    // 用户uid
+    int64 uid = 1;
+    // 动态id
+    string dyn_id = 2;
+    // 动态类型(透传extend中的dyn_type)
+    int64 dyn_type = 3;
+    // 业务方资源id
+    string rid = 4;
+    // 点赞类型
+    ThumbType type = 5;
+}
+
+//
+enum ThumbType {
+    //
+    cancel = 0;
+    //
+    thumb = 1;
+}
+
+// 动态发布生成临时卡-请求
+message DynFakeCardReq {
+    //卡片内容json string
+    string content = 1;
+}
+
+
+// 关注推荐up主换一换-请求
+message DynRcmdUpExchangeReq {
+    // 登录用户id
+    int64 uid = 1;
+    // 上一次不感兴趣的ts，单位：秒；该字段透传给搜索
+    int64 dislikeTs = 2;
+    // 需要与服务端确认或参照客户端现有参数
+    string from = 3;
+}
+
+// 关注推荐up主换一换-响应
+message DynRcmdUpExchangeReply {
+    // 无关注推荐
+    Unfollow unfollow = 1;
+}
+
+// 最近访问-个人feed流列表-请求
+message DynAllPersonalReq {
+    // 被访问者的 UID
+    int64 host_uid = 1;
+    // 偏移量 第一页可传空
+    string offset = 2;
+    // 标明下拉几次
+    int32 page = 3;
+    // 是否是预加载 默认是1；客户端预加载。1：是预加载，不更新已读进度，不会影响小红点；0：非预加载，更新已读进度
+    int32 is_preload = 4;
+    // 秒开参数 新版本废弃，统一使用player_args
+    PlayurlParam playurl_param = 5;
+    // 客户端时区 兼容UTC-14和Etc/GMT+12,时区区间[-12,14] 东八区为8
+    int32 local_time = 6;
+    // 服务端生成的透传上报字段
+    string footprint = 7;
+    // 来源
+    string from = 8;
+    // 秒开用
+    bilibili.app.archive.middleware.v1.PlayerArgs player_args = 9;
+}
+
+
+// 顶部预约卡
+message TopAdditionUP {
+    // 预约卡
+    repeated AdditionUP up = 1;
+    // 折叠数量，大于多少个进行折叠
+    int32 has_fold = 2;
+}
+
+// 最近访问-标记已读-请求
+message DynAllUpdOffsetReq {
+    // 被访问者的UID
+    int64 host_uid = 1;
+    // 用户已读进度
+    string read_offset = 2;
+    // 服务端生成的透传上报字段
+    string footprint = 3;
 }

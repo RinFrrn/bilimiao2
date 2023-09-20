@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,11 +11,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import bilibili.app.dynamic.v2.ModuleOuterClass
 import cn.a10miaomiao.miao.binding.android.view._tag
 import cn.a10miaomiao.miao.binding.miaoEffect
-import com.a10miaomiao.bilimiao.MainNavGraph
 import com.a10miaomiao.bilimiao.comm.*
 import com.a10miaomiao.bilimiao.comm.delegate.theme.ThemeDelegate
 import com.a10miaomiao.bilimiao.comm.recycler.*
 import com.a10miaomiao.bilimiao.commponents.dynamic.dynamicCardView
+import com.a10miaomiao.bilimiao.commponents.dynamic.dynamicUpItem
 import com.a10miaomiao.bilimiao.commponents.loading.ListState
 import com.a10miaomiao.bilimiao.commponents.loading.listStateView
 import com.a10miaomiao.bilimiao.commponents.video.videoItem
@@ -31,12 +29,13 @@ import com.chad.library.adapter.base.listener.OnItemClickListener
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import splitties.dimensions.dip
 import splitties.toast.toast
 import splitties.views.backgroundColor
 import splitties.views.dsl.core.*
 import splitties.views.dsl.recyclerview.recyclerView
 
-class DynamicFragment: RecyclerViewFragment(), DIAware {
+class DynamicFragment : RecyclerViewFragment(), DIAware {
 
     companion object {
         fun newFragmentInstance(): DynamicFragment {
@@ -69,7 +68,7 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
     }
 
     override fun refreshList() {
-        if (!viewModel.list.loading) {
+        if (!viewModel.currentDynamicPage.paginationInfo.loading) {
             viewModel.refreshList()
         }
     }
@@ -98,17 +97,19 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
             && tag.second is String
         ) {
             val (type, id) = tag as Pair<Int, String>
-            when(type) {
+            when (type) {
                 ModuleOuterClass.ModuleDynamicType.mdl_dyn_archive_VALUE -> {
                     val args = UserFragment.createArguments(id)
                     Navigation.findNavController(it)
                         .navigate(UserFragment.actionId, args)
                 }
+
                 ModuleOuterClass.ModuleDynamicType.mdl_dyn_pgc_VALUE -> {
                     val args = BangumiDetailFragment.createArguments(id)
                     Navigation.findNavController(it)
                         .navigate(BangumiDetailFragment.actionId, args)
                 }
+
                 else -> {
                     toast("未知跳转类型")
                 }
@@ -118,19 +119,21 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
 
     private val handleDynamicContentClick = View.OnClickListener {
         val index = it.tag
-        if (index is Int && index in viewModel.list.data.indices) {
-            val item = viewModel.list.data[index]
-            when(item.dynamicType) {
+        if (index is Int && index in viewModel.currentDynamicPage.paginationInfo.data.indices) {
+            val item = viewModel.currentDynamicPage.paginationInfo.data[index]
+            when (item.dynamicType) {
                 ModuleOuterClass.ModuleDynamicType.mdl_dyn_archive_VALUE -> {
                     val args = VideoInfoFragment.createArguments(item.dynamicContent.id)
                     Navigation.findNavController(it)
                         .navigate(VideoInfoFragment.actionId, args)
                 }
+
                 ModuleOuterClass.ModuleDynamicType.mdl_dyn_pgc_VALUE -> {
                     val args = BangumiDetailFragment.createArguments(item.dynamicContent.id)
                     Navigation.findNavController(it)
                         .navigate(BangumiDetailFragment.actionId, args)
                 }
+
                 else -> {
                     toast("未知跳转类型")
                 }
@@ -138,7 +141,7 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
         }
     }
 
-    val itemUi = miaoBindingItemUi<DynamicViewModel.DataInfo> { item, index ->
+    private val dynamicItemUi = miaoBindingItemUi<DynamicViewModel.DataInfo> { item, index ->
         dynamicCardView(
             dynamicType = item.dynamicType,
             mid = item.mid,
@@ -159,8 +162,24 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
 //                _show = item.dynamicType == ModuleOuterClass.ModuleDynamicType.mdl_dyn_archive
             },
             onAuthorClick = handleAuthorClick,
-        ).apply {
-            layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
+        )
+    }
+
+    private val upListItemUi = miaoBindingItemUi<DynamicViewModel.UpListItem> { item, index ->
+        val isSelected = viewModel.selectedUpUid == item.uid
+
+        dynamicUpItem(item.face, item.name, isSelected).apply {
+            _tag = index
+
+            miaoEffect(null) {
+                setOnClickListener { view: View ->
+                    val tag = view.tag as Int
+                    val selectedUp = viewModel.upList[tag]
+
+                    val alreadySelected = selectedUp.uid == viewModel.selectedUpUid
+                    viewModel.setSelectedUpAndLoadNewIfPossible(if (alreadySelected) null else selectedUp.uid)
+                }
+            }
         }
     }
 
@@ -168,12 +187,38 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
         val windowStore = miaoStore<WindowStore>(viewLifecycleOwner, di)
         val contentInsets = windowStore.getContentInsets(parentView)
 
-        verticalLayout {
-//            _leftPadding = contentInsets.left + config.pagePadding
-//            _rightPadding = contentInsets.right + config.pagePadding
-//            _topPadding = config.pagePadding
-//            _bottomPadding = contentInsets.bottom
+        horizontalLayout {
+            views {
+                +dynamicUpListView(viewModel.upList, contentInsets)..lParams(
+                    wrapContent,
+                    matchParent
+                ) {
+                    width = dip(220)
+                    bottomMargin = contentInsets.bottom
+                }
 
+                +dynamicRecyclerView(viewModel.currentDynamicPage, contentInsets)
+            }
+        }
+//        verticalLayout {
+////            _leftPadding = contentInsets.left + config.pagePadding
+////            _rightPadding = contentInsets.right + config.pagePadding
+////            _topPadding = config.pagePadding
+////            _bottomPadding = contentInsets.bottom
+//
+//            views {
+//
+//            }
+//        }
+    }
+
+    fun MiaoUI.dynamicRecyclerView(
+        dynamicPaginationInfo: DynamicViewModel.DynamicPaginationInfo,
+        contentInsets: WindowStore.Insets
+    ): View {
+        val paginationInfo = dynamicPaginationInfo.paginationInfo
+
+        return verticalLayout {
             views {
                 +recyclerviewAtViewPager2 {
                     backgroundColor = config.windowBackgroundColor
@@ -182,10 +227,12 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
                     )
 
                     val mAdapter = _miaoAdapter(
-                        items = viewModel.list.data,
-                        itemUi = itemUi,
+                        items = paginationInfo.data,
+                        itemUi = dynamicItemUi,
+                        isForceUpdate = true
                     ) {
-                        stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                        stateRestorationPolicy =
+                            RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                         setOnItemClickListener(handleItemClick)
                         loadMoreModule.setOnLoadMoreListener {
                             viewModel.loadMode()
@@ -195,14 +242,15 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
                         +listStateView(
                             when {
                                 viewModel.triggered -> ListState.NORMAL
-                                viewModel.list.loading -> ListState.LOADING
-                                viewModel.list.fail -> ListState.FAIL
-                                viewModel.list.finished -> ListState.NOMORE
+                                paginationInfo.loading -> ListState.LOADING
+                                paginationInfo.fail -> ListState.FAIL
+                                paginationInfo.finished -> ListState.NOMORE
                                 else -> ListState.NORMAL
                             },
                             viewModel::tryAgainLoadData,
                         )..lParams(matchParent, wrapContent) {
-                            bottomMargin = contentInsets.bottom
+                            topMargin = dip(16)
+                            bottomMargin = dip(16) + contentInsets.bottom
                         }
 
                     }
@@ -210,9 +258,34 @@ class DynamicFragment: RecyclerViewFragment(), DIAware {
                     setColorSchemeResources(config.themeColorResource)
                     setOnRefreshListener(handleRefresh)
                     _isRefreshing = viewModel.triggered
-                }..lParams(matchParent, matchParent)
+                }..lParams(matchParent, matchParent) {
+                    setPadding(0, dip(6), 0, dip(6))
+                }
             }
         }
     }
 
+    fun MiaoUI.dynamicUpListView(
+        upList: MutableList<DynamicViewModel.UpListItem>,
+        contentInsets: WindowStore.Insets
+    ): View = horizontalLayout {
+        views {
+            +recyclerView {
+                backgroundColor = config.windowBackgroundColor
+                mLayoutManager = _miaoLayoutManage(
+                    LinearLayoutManager(context)
+                )
+
+                _miaoAdapter(
+                    items = upList,
+                    itemUi = upListItemUi,
+                    isForceUpdate = true
+                ) {
+                    stateRestorationPolicy =
+                        RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+//                    setOnItemClickListener(handleItemClick)
+                }
+            }
+        }
+    }
 }

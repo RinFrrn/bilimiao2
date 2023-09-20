@@ -65,6 +65,7 @@ class RecommendViewModel(
                 }
                 ui.setState {
                     if (idx == 0L) {
+                        list = PaginationInfo()  // 下拉刷新获取到新数据再清空旧数据
                         list.data = itemsList.toMutableList()
                     } else {
                         list.data.addAll(itemsList)
@@ -109,7 +110,7 @@ class RecommendViewModel(
 
     fun refreshList() {
         ui.setState {
-            list = PaginationInfo()
+//            list = PaginationInfo()
             triggered = true
             loadData(0)
         }

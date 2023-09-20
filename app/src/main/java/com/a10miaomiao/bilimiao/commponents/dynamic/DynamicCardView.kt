@@ -3,9 +3,9 @@ package com.a10miaomiao.bilimiao.commponents.dynamic
 import android.content.res.ColorStateList
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import cn.a10miaomiao.miao.binding.android.view._tag
 import cn.a10miaomiao.miao.binding.android.widget._text
-import cn.a10miaomiao.miao.binding.miaoEffect
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.MiaoUI
 import com.a10miaomiao.bilimiao.comm._network
@@ -16,6 +16,7 @@ import com.a10miaomiao.bilimiao.widget.rcImageView
 import splitties.dimensions.dip
 import splitties.views.bottomPadding
 import splitties.views.dsl.core.*
+import splitties.views.dsl.material.materialCardView
 import splitties.views.padding
 import splitties.views.topPadding
 
@@ -68,7 +69,7 @@ fun MiaoUI.dynamicAuthorView(
                     }..lParams {
                         width = wrapContent
                         height = wrapContent
-                        topMargin = dip(2)
+//                        topMargin = dip(2)
                     }
                 }
             }
@@ -85,11 +86,11 @@ fun MiaoUI.dynamicStatView(
         padding = config.pagePadding
         topPadding = config.smallPadding
         gravity = Gravity.CENTER
-            views {
-                val iconSize = dip(14)
-                +imageView {
-                    setImageResource(R.drawable.ic_comment_unlike)
-                    imageTintList = ColorStateList.valueOf(config.foregroundAlpha45Color)
+        views {
+            val iconSize = dip(14)
+            +imageView {
+                setImageResource(R.drawable.ic_comment_unlike)
+                imageTintList = ColorStateList.valueOf(config.foregroundAlpha45Color)
 //                    _tag = index
 //                    miaoEffect(isLike) {
 //                        imageTintList = ColorStateList.valueOf(
@@ -101,13 +102,13 @@ fun MiaoUI.dynamicStatView(
 //                        )
 //                    }
 //                    onLikeClick?.let { setOnClickListener(it) }
-                }..lParams(iconSize, iconSize) {
-                    rightMargin = dip(4)
-                }
-                +textView {
-                    textSize = 14f
-                    _text = NumberUtil.converString(like)
-                    setTextColor(config.foregroundAlpha45Color)
+            }..lParams(iconSize, iconSize) {
+                rightMargin = dip(8)
+            }
+            +textView {
+                textSize = 14f
+                _text = NumberUtil.converString(like)
+                setTextColor(config.foregroundAlpha45Color)
 //                    _tag = index
 //                    miaoEffect(isLike) {
 //                        setTextColor(
@@ -119,20 +120,20 @@ fun MiaoUI.dynamicStatView(
 //                        )
 //                    }
 //                    onLikeClick?.let { setOnClickListener(it) }
-                }..lParams(dip(150), wrapContent)
-                +imageView {
-                    setImageResource(R.drawable.ic_comment_reply)
-                    imageTintList = ColorStateList.valueOf(config.foregroundAlpha45Color)
-                }..lParams(iconSize, iconSize) {
-                    rightMargin = dip(4)
-                }
-                +textView {
-                    setTextColor(config.foregroundAlpha45Color)
-                    textSize = 14f
-
-                    _text = NumberUtil.converString(reply)
-                }
+            }..lParams(dip(150), wrapContent)
+            +imageView {
+                setImageResource(R.drawable.ic_comment_reply)
+                imageTintList = ColorStateList.valueOf(config.foregroundAlpha45Color)
+            }..lParams(iconSize, iconSize) {
+                rightMargin = dip(4)
             }
+            +textView {
+                setTextColor(config.foregroundAlpha45Color)
+                textSize = 14f
+
+                _text = NumberUtil.converString(reply)
+            }
+        }
     }
 }
 
@@ -148,33 +149,46 @@ fun MiaoUI.dynamicCardView(
     contentView: View,
     onAuthorClick: View.OnClickListener? = null,
 ): View {
-    return verticalLayout {
+    return materialCardView {
+        layoutParams = ViewGroup.MarginLayoutParams(matchParent, wrapContent).apply {
+            setMargins(dip(12), dip(4), dip(12), dip(4))
+        }
+//        setContentPadding(dip(8), dip(8), dip(8), dip(8))
+
+        radius = dip(16f)
+        strokeWidth = 0
+        _cardBackgroundColor = config.blockBackgroundColor
+
         views {
+            +verticalLayout {
+                views {
 
-            +dynamicAuthorView(
-                dynamicType = dynamicType,
-                mid = mid,
-                name = name,
-                face = face,
-                labelText = labelText,
-                onAuthorClick = onAuthorClick,
-            )..lParams(
-                width = matchParent,
-                height = wrapContent,
-            )
+                    +dynamicAuthorView(
+                        dynamicType = dynamicType,
+                        mid = mid,
+                        name = name,
+                        face = face,
+                        labelText = labelText,
+                        onAuthorClick = onAuthorClick,
+                    )..lParams(
+                        width = matchParent,
+                        height = wrapContent,
+                    )
 
-            +contentView..lParams(
-                width = matchParent,
-                height = wrapContent,
-            )
+                    +contentView..lParams(
+                        width = matchParent,
+                        height = wrapContent,
+                    )
 
-            +dynamicStatView(
-                like = like,
-                reply = reply,
-            )..lParams(
-                width = matchParent,
-                height = wrapContent,
-            )
+                    +dynamicStatView(
+                        like = like,
+                        reply = reply,
+                    )..lParams(
+                        width = matchParent,
+                        height = wrapContent,
+                    )
+                }
+            }
         }
     }
 }

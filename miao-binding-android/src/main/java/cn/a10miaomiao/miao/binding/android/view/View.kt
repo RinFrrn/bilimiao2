@@ -1,5 +1,6 @@
 package cn.a10miaomiao.miao.binding.android.view
 
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.annotation.DrawableRes
@@ -50,5 +51,9 @@ inline var View._backgroundResource: Int
         setBackgroundResource(value)
     }
 
-
+inline var View._backgroundTintList: ColorStateList
+    @Deprecated(NO_GETTER, level = DeprecationLevel.HIDDEN) get() = noGetter
+    set(value) = miaoEffect(value) {
+        backgroundTintList = value
+    }
 
