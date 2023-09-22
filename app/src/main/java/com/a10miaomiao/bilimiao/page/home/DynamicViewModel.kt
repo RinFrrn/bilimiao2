@@ -33,11 +33,11 @@ class DynamicViewModel(
     //    private var _offset = ""
 //    private var _baseline = ""
 
-    val allDynamicPage = DynamicPaginationInfo()
+    private val allDynamicPage = DynamicPaginationInfo()
+    private val upDynamicPagesMap: MutableMap<String, DynamicPaginationInfo> = mutableMapOf()
 
     var upList: MutableList<UpListItem> = mutableListOf()
         private set
-    val upDynamicPagesMap: MutableMap<String, DynamicPaginationInfo> = mutableMapOf()
 
     var triggered = false
 
@@ -52,23 +52,29 @@ class DynamicViewModel(
         loadAllData()
     }
 
-    fun setSelectedUpAndLoadNewIfPossible(uid: String?) {
+    fun setSelectedAndLoadNewIfPossible(newUid: String?, completion: () -> Unit) {
         ui.setState {
-            selectedUpUid = uid
+            selectedUpUid = newUid
         }
 
-        if (uid != null) {
+        if (newUid != null) {
+            ui.setState {
+                upList.firstOrNull { it.uid == newUid }?.hasUpdate = false
+            }
             // putIfAbsent
-            upDynamicPagesMap.getOrPut(uid) { DynamicPaginationInfo() }
+            upDynamicPagesMap.getOrPut(newUid) { DynamicPaginationInfo() }
         }
 
         ui.setState {
             currentDynamicPage = upDynamicPagesMap[selectedUpUid ?: ""] ?: allDynamicPage
 
-            if (uid != null && currentDynamicPage.paginationInfo.data.isEmpty()) {
-                loadUpData(uid, "")
+            if (newUid != null && currentDynamicPage.paginationInfo.data.isEmpty()) {
+                loadUpData(newUid, "")
             }
+
         }
+
+        fragment.requireView().post(completion)
     }
 
 
@@ -129,6 +135,7 @@ class DynamicViewModel(
                 .request(req)
                 .awaitCall()
 //            if (result.hasDynamicList()) {
+            val noMore = result.hasMore.not()
 
             upPage.offset = result.offset
             upPage.baseline = result.readOffset
@@ -146,11 +153,14 @@ class DynamicViewModel(
 
             ui.setState {
                 if (offset.isBlank()) {
+                    upPage.scrollLocation = ScrollLocation()
                     upPage.paginationInfo = PaginationInfo()
                     upPage.paginationInfo.data = itemsList.toMutableList()
                 } else {
                     upPage.paginationInfo.data.addAll(itemsList)
                 }
+
+                if (noMore) upPage.paginationInfo.finished = true
             }
 
         } catch (e: Exception) {
@@ -215,6 +225,7 @@ class DynamicViewModel(
 
                 ui.setState {
                     if (offset.isBlank()) {
+                        allDynamicPage.scrollLocation = ScrollLocation()
                         allDynamicPage.paginationInfo = PaginationInfo()
                         allDynamicPage.paginationInfo.data = itemsList.toMutableList()
                     } else {
@@ -297,7 +308,8 @@ class DynamicViewModel(
     data class DynamicPaginationInfo(
         var paginationInfo: PaginationInfo<DataInfo> = PaginationInfo(),
         var offset: String = "",
-        var baseline: String = ""
+        var baseline: String = "",
+        var scrollLocation: ScrollLocation = ScrollLocation()
     )
 
     data class DataInfo(
@@ -320,7 +332,7 @@ class DynamicViewModel(
 
     data class UpListItem(
         // 是否有更新
-        val hasUpdate: Boolean,
+        var hasUpdate: Boolean,
         // up主头像
         val face: String,
         // up主昵称
@@ -357,6 +369,8 @@ class DynamicViewModel(
         // 轮播中
         LIVE_ROTATION
     }
+
+    data class ScrollLocation(val position: Int = 0, val offset: Int = 0)
 }
 //19:51:18.861  I  footprint: "6e4d753732fddd9971251ca13b650839"
 //19:51:18.861  I  list {

@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ProgressBar
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.annotation.StyleRes
@@ -113,4 +114,20 @@ inline fun View.materialDivider(
     initView: MaterialDivider.() -> Unit = {}
 ): MaterialDivider {
     return view({ MaterialDivider(it) }, id).apply(initView)
+}
+
+inline fun View.scrollView(
+    @IdRes id: Int = View.NO_ID,
+    @StyleRes theme: Int = NO_THEME,
+    initView: ScrollView.() -> Unit = {}
+): ScrollView {
+    return view({ ScrollView(it) }, id).apply(initView)
+}
+
+inline fun Ui.scrollView(
+    @IdRes id: Int = View.NO_ID,
+    @StyleRes theme: Int = NO_THEME,
+    initView: ScrollView.() -> Unit = {}
+): ScrollView {
+    return view({ ScrollView(it) }, id).apply(initView)
 }

@@ -5,12 +5,26 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import com.a10miaomiao.bilimiao.comm.attr
+import com.a10miaomiao.bilimiao.comm.flexboxLayout
+import com.a10miaomiao.bilimiao.comm.scrollView
 import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
 import com.a10miaomiao.bilimiao.config.config
 import com.a10miaomiao.bilimiao.widget.comm.AppBarView
 import com.a10miaomiao.bilimiao.widget.comm.MenuItemView
+import com.google.android.flexbox.AlignContent
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.JustifyContent
 import splitties.dimensions.dip
 import splitties.views.*
+import splitties.views.dsl.constraintlayout.centerHorizontally
+import splitties.views.dsl.constraintlayout.centerVertically
+import splitties.views.dsl.constraintlayout.constraintLayout
+import splitties.views.dsl.constraintlayout.endOfParent
+import splitties.views.dsl.constraintlayout.lParams
+import splitties.views.dsl.constraintlayout.startOfParent
+import splitties.views.dsl.constraintlayout.topOfParent
+import splitties.views.dsl.coordinatorlayout.coordinatorLayout
 import splitties.views.dsl.core.*
 
 class AppBarHorizontalUi(
@@ -26,14 +40,14 @@ class AppBarHorizontalUi(
     }
 
     val mNavigationIconLayout = frameLayout {
-        padding = dip(10)
-        bottomPadding = 0
+        padding = dip(24)
+        bottomPadding = 16
         setOnClickListener(backClick)
         setOnLongClickListener(backLongClick)
         addView(mNavigationIcon, lParams {
             gravity = Gravity.CENTER
-            width = dip(24)
-            height = dip(24)
+            width = dip(28)
+            height = dip(28)
         })
     }
 
@@ -51,25 +65,51 @@ class AppBarHorizontalUi(
     }
 
     val mNavigationMemuLayout = verticalLayout {
-        gravity = Gravity.CENTER_HORIZONTAL
+        gravity = Gravity.CENTER
     }
 
-    override val root = verticalLayout {
-
-        addView(mNavigationIconLayout, lParams {
-            width = matchParent
-            height = wrapContent
-        })
-        addView(mTitleLayout, lParams {
-            width = matchParent
-            height = wrapContent
-        })
-        addView(mNavigationMemuLayout, lParams {
-            width = matchParent
-            height = matchParent
-            weight = 1f
-        })
+    val mTopLinearLayout = verticalLayout {
+        addView(mNavigationIconLayout)
+        addView(mTitleLayout)
     }
+
+    override val root = scrollView {
+        isFillViewport = true
+
+        addView(verticalLayout {
+
+            addView(mTopLinearLayout, lParams(matchParent, 0) {
+                weight = 1f
+            })
+            addView(mNavigationMemuLayout, lParams(matchParent, wrapContent))
+            addView(space(), lParams(matchParent, 0) { weight = 1f })
+        }, lParams(matchParent, wrapContent))
+    }
+
+//    addView(frameLayout {
+//
+//        addView(mTopLinearLayout, lParams(matchParent, wrapContent) {
+//            gravity = Gravity.START
+//        })
+//        addView(mNavigationMemuLayout, lParams(matchParent, wrapContent) {
+//            gravity = Gravity.CENTER
+//        })
+//    }, lParams(matchParent, wrapContent))
+
+//    addView(constraintLayout {
+//
+//        addView(mTopLinearLayout, lParams(wrapContent, wrapContent) {
+//            topOfParent()
+//            centerHorizontally()
+//            bottomToTop = mNavigationMemuLayout.id
+//        })
+//        addView(mNavigationMemuLayout, lParams(wrapContent, wrapContent) {
+//            centerVertically()
+//            centerHorizontally()
+//            topToBottom = mTopLinearLayout.id
+//        })
+//    }, lParams(matchParent, wrapContent))
+
 
     override fun setProp(prop: AppBarView.PropInfo?) {
         if (prop != null) {
@@ -86,7 +126,7 @@ class AppBarHorizontalUi(
                 mTitleLayout.visibility = View.GONE
             }
 
-            val menus = prop.menus
+            val menus = prop.menus?.reversed()
             if (menus == null) {
                 mNavigationMemuLayout.removeAllViews()
             } else {
@@ -94,11 +134,13 @@ class AppBarHorizontalUi(
                     menus.forEachIndexed { index, menu ->
                         var menuItemView: MenuItemView
                         if (index >= childCount) {
-                            menuItemView = MenuItemView(ctx)
-                            menuItemView.orientation = LinearLayout.HORIZONTAL
-                            menuItemView.minimumHeight = dip(40)
-                            menuItemView.setOnClickListener(menuItemClick)
-                            menuItemView.setBackgroundResource(config.selectableItemBackground)
+                            menuItemView = MenuItemView(ctx).apply {
+                                orientation = LinearLayout.VERTICAL
+                                minimumHeight = dip(64)
+                                iconSize = dip(26)
+                                setOnClickListener(menuItemClick)
+                                setBackgroundResource(config.selectableItemBackground)
+                            }
                             addView(menuItemView, lParams {
                                 width = matchParent
                                 height = wrapContent

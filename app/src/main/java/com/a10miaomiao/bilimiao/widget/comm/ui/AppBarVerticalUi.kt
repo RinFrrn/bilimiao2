@@ -143,7 +143,8 @@ class AppBarVerticalUi(
                         if (index >= childCount) {
                             menuItemView = MenuItemView(ctx)
                             menuItemView.orientation = LinearLayout.VERTICAL
-                            menuItemView.minimumWidth = dip(60)
+                            menuItemView.minimumWidth = dip(64)
+                            menuItemView.iconSize = dip(22)
                             menuItemView.setBackgroundResource(config.selectableItemBackgroundBorderless)
                             menuItemView.setOnClickListener(menuItemClick)
                             menuItemView.setOnLongClickListener(menuItemLongClick)

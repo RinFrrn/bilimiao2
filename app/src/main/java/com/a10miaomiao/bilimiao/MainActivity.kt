@@ -110,7 +110,8 @@ class MainActivity
             ui.root.onPlayerChanged = {
                 updateStatusBarColor()
 
-                setWindowInsets(ui.root.rootWindowInsets)
+                // TRY TO FIX: ui.root.rootWindowInsets must not be null
+                ui.root.rootWindowInsets?.let { setWindowInsets(it) }
             }
         } else {
             setWindowInsetsAndroidL()

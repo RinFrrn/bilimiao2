@@ -51,7 +51,7 @@ fun MiaoUI.videoItem(
             }..lParams {
                 width = dip(140)
                 height = dip(85)
-                rightMargin = dip(5)
+                rightMargin = dip(8)
             }
 
             +verticalLayout {

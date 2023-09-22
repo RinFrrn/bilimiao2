@@ -2,6 +2,7 @@ package com.a10miaomiao.bilimiao.comm.mypage
 
 import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 
 data class MenuItemPropInfo (
@@ -11,6 +12,8 @@ data class MenuItemPropInfo (
     var iconDrawable: Drawable? = null,
     @DrawableRes
     var iconResource: Int? = null,
+    @ColorInt
+    var iconTintColor: Int? = null,
     var iconFileName: String? = null,
     var visibility: Int = View.VISIBLE
 ) {

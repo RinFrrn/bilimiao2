@@ -1,20 +1,16 @@
 package com.a10miaomiao.bilimiao.widget.comm
 
 import android.content.Context
-import android.graphics.drawable.Drawable
+import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.annotation.DrawableRes
-import androidx.core.view.marginTop
+import com.a10miaomiao.bilimiao.comm.attr
 import com.a10miaomiao.bilimiao.comm.mypage.MenuItemPropInfo
 import com.a10miaomiao.bilimiao.config.config
-import org.kodein.di.android.di
 import splitties.dimensions.dip
 import splitties.views.dsl.core.*
-import splitties.views.rightPadding
 
 class MenuItemView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -27,12 +23,23 @@ class MenuItemView @JvmOverloads constructor(
             updateView()
         }
 
+    var iconSize: Int = dip(20)
+        set(newSize) {
+            field = newSize
+            ui.icon.layoutParams.apply {
+                height = iconSize
+                width = iconSize
+            }
+        }
+
     init {
         gravity = Gravity.CENTER
         addView(ui.icon, lParams {
             horizontalMargin = dip(5)
-            height = dip(20)
-            width =  dip(20)
+            verticalMargin = dip(4)
+
+            height = dip(iconSize)
+            width = dip(iconSize)
         })
         addView(ui.root, lParams {
             height = wrapContent
@@ -40,14 +47,18 @@ class MenuItemView @JvmOverloads constructor(
         })
     }
 
-    private fun updateView () {
+    private fun updateView() {
         if (visibility != prop.visibility) {
             visibility = prop.visibility
         }
+
+        ui.icon.imageTintList = prop.iconTintColor?.let { ColorStateList.valueOf(it) }
+
         if (prop.iconResource == null && prop.iconDrawable == null && prop.iconFileName == null) {
             ui.icon.visibility = View.GONE
         } else if (prop.iconFileName != null) {
-            val iconResource = context.resources.getIdentifier(prop.iconFileName, "drawable", context.packageName)
+            val iconResource =
+                context.resources.getIdentifier(prop.iconFileName, "drawable", context.packageName)
             ui.icon.visibility = View.VISIBLE
             ui.icon.setImageResource(iconResource)
         } else if (prop.iconDrawable != null) {
@@ -75,7 +86,7 @@ class MenuItemView @JvmOverloads constructor(
         }
     }
 
-    inner class ViewUi: Ui {
+    inner class ViewUi : Ui {
         override val ctx: Context get() = context
 
         val title = textView {

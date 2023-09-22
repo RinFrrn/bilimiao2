@@ -157,7 +157,7 @@ fun MiaoUI.dynamicCardView(
 
         radius = dip(16f)
         strokeWidth = 0
-        _cardBackgroundColor = config.blockBackgroundColor
+        _cardBackgroundColor = config.windowBackgroundColor
 
         views {
             +verticalLayout {

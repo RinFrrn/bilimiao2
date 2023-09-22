@@ -1,5 +1,6 @@
 package com.a10miaomiao.bilimiao.page.home
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -168,7 +169,7 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
     private val upListItemUi = miaoBindingItemUi<DynamicViewModel.UpListItem> { item, index ->
         val isSelected = viewModel.selectedUpUid == item.uid
 
-        dynamicUpItem(item.face, item.name, isSelected).apply {
+        dynamicUpItem(item.face, item.name, isSelected, item.hasUpdate).apply {
             _tag = index
 
             miaoEffect(null) {
@@ -176,8 +177,18 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
                     val tag = view.tag as Int
                     val selectedUp = viewModel.upList[tag]
 
+                    val currPos = mLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
+                    val currOffset = mLayoutManager?.findViewByPosition(currPos)?.y?.toInt() ?: 0
+                    viewModel.currentDynamicPage.scrollLocation =
+                        DynamicViewModel.ScrollLocation(currPos, currOffset)
+
                     val alreadySelected = selectedUp.uid == viewModel.selectedUpUid
-                    viewModel.setSelectedUpAndLoadNewIfPossible(if (alreadySelected) null else selectedUp.uid)
+                    val newUid = if (alreadySelected) null else selectedUp.uid
+
+                    viewModel.setSelectedAndLoadNewIfPossible(newUid) {
+                        val (newPos, newOffset) = viewModel.currentDynamicPage.scrollLocation
+                        mLayoutManager?.scrollToPositionWithOffset(newPos, newOffset)
+                    }
                 }
             }
         }
@@ -187,27 +198,37 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
         val windowStore = miaoStore<WindowStore>(viewLifecycleOwner, di)
         val contentInsets = windowStore.getContentInsets(parentView)
 
-        horizontalLayout {
-            views {
-                +dynamicUpListView(viewModel.upList, contentInsets)..lParams(
-                    wrapContent,
-                    matchParent
-                ) {
-                    width = dip(220)
-                    bottomMargin = contentInsets.bottom
-                }
+//        if (resources.configuration.screenWidthDp > 400) {
+            horizontalLayout {
+                backgroundColor = config.blockBackgroundColor
 
-                +dynamicRecyclerView(viewModel.currentDynamicPage, contentInsets)
+                views {
+                    +dynamicUpListView(viewModel.upList, contentInsets)..lParams(
+                        matchParent,
+                        matchParent
+                    ) {
+                        width = dip(220)
+                        bottomMargin = contentInsets.bottom
+                    }
+
+                    +dynamicRecyclerView(viewModel.currentDynamicPage, contentInsets)
+                }
             }
-        }
-//        verticalLayout {
-////            _leftPadding = contentInsets.left + config.pagePadding
-////            _rightPadding = contentInsets.right + config.pagePadding
-////            _topPadding = config.pagePadding
-////            _bottomPadding = contentInsets.bottom
+//        } else {
+//            verticalLayout {
+//                backgroundColor = config.blockBackgroundColor
 //
-//            views {
+//                views {
+//                    +dynamicUpListView(viewModel.upList, contentInsets)..lParams(
+//                        matchParent,
+//                        matchParent
+//                    ) {
+//                        height = dip(64)
+////                        bottomMargin = contentInsets.bottom
+//                    }
 //
+//                    +dynamicRecyclerView(viewModel.currentDynamicPage, contentInsets)
+//                }
 //            }
 //        }
     }
@@ -221,10 +242,11 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
         return verticalLayout {
             views {
                 +recyclerviewAtViewPager2 {
-                    backgroundColor = config.windowBackgroundColor
                     mLayoutManager = _miaoLayoutManage(
                         LinearLayoutManager(requireContext())
                     )
+                    clipToPadding = false
+                    setPadding(0, dip(6), 0, dip(6))
 
                     val mAdapter = _miaoAdapter(
                         items = paginationInfo.data,
@@ -258,9 +280,7 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
                     setColorSchemeResources(config.themeColorResource)
                     setOnRefreshListener(handleRefresh)
                     _isRefreshing = viewModel.triggered
-                }..lParams(matchParent, matchParent) {
-                    setPadding(0, dip(6), 0, dip(6))
-                }
+                }..lParams(matchParent, matchParent)
             }
         }
     }
@@ -271,10 +291,11 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
     ): View = horizontalLayout {
         views {
             +recyclerView {
-                backgroundColor = config.windowBackgroundColor
-                mLayoutManager = _miaoLayoutManage(
-                    LinearLayoutManager(context)
+                _miaoLayoutManage(
+                    LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 )
+                clipToPadding = false
+                setPadding(0, dip(6), 0, dip(6))
 
                 _miaoAdapter(
                     items = upList,
@@ -285,7 +306,7 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
                         RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 //                    setOnItemClickListener(handleItemClick)
                 }
-            }
+            }..lParams(matchParent, matchParent)
         }
     }
 }
