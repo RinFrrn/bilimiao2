@@ -85,17 +85,20 @@ class RecommendFragment : RecyclerViewFragment(), DIAware {
 
     private val handleItemClick = OnItemClickListener { adapter, view, position ->
         val item = viewModel.list.data[position]
-        if (item.goto == "av" || item.goto == "vertical_av") {
-            val args = VideoInfoFragment.createArguments(item.param)
-            Navigation.findNavController(view)
-                .navigate(VideoInfoFragment.actionId, args)
-        } else {
-            BiliUrlMatcher.toUrlLink(view, item.uri)
+        when (item.goto) {
+            "av", "vertical_av" -> {
+                val args = VideoInfoFragment.createArguments(item.param)
+                Navigation.findNavController(view)
+                    .navigate(VideoInfoFragment.actionId, args)
+            }
+
+            "live" -> BiliUrlMatcher.toUrlLink(view, "bilibili://live/${item.param}")
+            else -> BiliUrlMatcher.toUrlLink(view, item.uri)
         }
     }
 
     val itemUi = miaoBindingItemUi<RecommendCardInfo> { item, index ->
-//        println(item)
+        println(item)
         //card_type=small_cover_v2, card_goto=av, goto=av, ... cover_right_text=1:52, cover_right_content_description=1分钟52秒
         //card_type=cm_v2, card_goto=ad_av, goto=av
         //card_type=small_cover_v2, card_goto=live, goto=live, ... cover_right_text=真的想不出名儿了, cover_right_content_description=真的想不出名儿了

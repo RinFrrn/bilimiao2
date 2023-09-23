@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Orientation
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import bilibili.app.dynamic.v2.ModuleOuterClass
+import cn.a10miaomiao.miao.binding.android.view._show
 import cn.a10miaomiao.miao.binding.android.view._tag
 import cn.a10miaomiao.miao.binding.miaoEffect
 import com.a10miaomiao.bilimiao.comm.*
@@ -142,6 +144,24 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
         }
     }
 
+    private val handleUpClick = View.OnClickListener { view ->
+        val tag = view.tag as Int
+        val selectedUp = viewModel.upList[tag]
+
+        val currPos = mLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
+        val currOffset = mLayoutManager?.findViewByPosition(currPos)?.y?.toInt() ?: 0
+        viewModel.currentDynamicPage.scrollLocation =
+            DynamicViewModel.ScrollLocation(currPos, currOffset)
+
+        val alreadySelected = selectedUp.uid == viewModel.selectedUpUid
+        val newUid = if (alreadySelected) null else selectedUp.uid
+
+        viewModel.setSelectedAndLoadNewIfPossible(newUid) {
+            val (newPos, newOffset) = viewModel.currentDynamicPage.scrollLocation
+            mLayoutManager?.scrollToPositionWithOffset(newPos, newOffset)
+        }
+    }
+
     private val dynamicItemUi = miaoBindingItemUi<DynamicViewModel.DataInfo> { item, index ->
         dynamicCardView(
             dynamicType = item.dynamicType,
@@ -173,23 +193,7 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
             _tag = index
 
             miaoEffect(null) {
-                setOnClickListener { view: View ->
-                    val tag = view.tag as Int
-                    val selectedUp = viewModel.upList[tag]
-
-                    val currPos = mLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
-                    val currOffset = mLayoutManager?.findViewByPosition(currPos)?.y?.toInt() ?: 0
-                    viewModel.currentDynamicPage.scrollLocation =
-                        DynamicViewModel.ScrollLocation(currPos, currOffset)
-
-                    val alreadySelected = selectedUp.uid == viewModel.selectedUpUid
-                    val newUid = if (alreadySelected) null else selectedUp.uid
-
-                    viewModel.setSelectedAndLoadNewIfPossible(newUid) {
-                        val (newPos, newOffset) = viewModel.currentDynamicPage.scrollLocation
-                        mLayoutManager?.scrollToPositionWithOffset(newPos, newOffset)
-                    }
-                }
+                setOnClickListener(handleUpClick)
             }
         }
     }
@@ -199,21 +203,21 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
         val contentInsets = windowStore.getContentInsets(parentView)
 
 //        if (resources.configuration.screenWidthDp > 400) {
-            horizontalLayout {
-                backgroundColor = config.blockBackgroundColor
+        horizontalLayout {
+            backgroundColor = config.blockBackgroundColor
 
-                views {
-                    +dynamicUpListView(viewModel.upList, contentInsets)..lParams(
-                        matchParent,
-                        matchParent
-                    ) {
-                        width = dip(220)
-                        bottomMargin = contentInsets.bottom
-                    }
-
-                    +dynamicRecyclerView(viewModel.currentDynamicPage, contentInsets)
+            views {
+                +dynamicUpListView(viewModel.upList)..lParams(
+                    matchParent,
+                    matchParent
+                ) {
+                    width = dip(220)
+                    bottomMargin = contentInsets.bottom
                 }
+
+                +dynamicRecyclerView(viewModel.currentDynamicPage, contentInsets)
             }
+        }
 //        } else {
 //            verticalLayout {
 //                backgroundColor = config.blockBackgroundColor
@@ -287,12 +291,12 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
 
     fun MiaoUI.dynamicUpListView(
         upList: MutableList<DynamicViewModel.UpListItem>,
-        contentInsets: WindowStore.Insets
+        @Orientation orientation: Int = RecyclerView.VERTICAL
     ): View = horizontalLayout {
         views {
             +recyclerView {
                 _miaoLayoutManage(
-                    LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                    LinearLayoutManager(context, orientation, false)
                 )
                 clipToPadding = false
                 setPadding(0, dip(6), 0, dip(6))
