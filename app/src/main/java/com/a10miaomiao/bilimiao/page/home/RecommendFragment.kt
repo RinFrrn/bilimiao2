@@ -28,6 +28,7 @@ import com.a10miaomiao.bilimiao.commponents.video.videoItem
 import com.a10miaomiao.bilimiao.commponents.video.videoItemV
 import com.a10miaomiao.bilimiao.config.config
 import com.a10miaomiao.bilimiao.page.video.VideoInfoFragment
+import com.a10miaomiao.bilimiao.page.video.VideoPreLoadParam
 import com.a10miaomiao.bilimiao.store.WindowStore
 import com.a10miaomiao.bilimiao.widget.recyclerviewAtViewPager2
 import com.chad.library.adapter.base.listener.OnItemClickListener
@@ -87,7 +88,15 @@ class RecommendFragment : RecyclerViewFragment(), DIAware {
         val item = viewModel.list.data[position]
         when (item.goto) {
             "av", "vertical_av" -> {
-                val args = VideoInfoFragment.createArguments(item.param)
+                val args = VideoPreLoadParam(
+                    aid = item.player_args.aid,
+                    cid = item.player_args.cid,
+                    cover = item.cover,
+                    title = item.title,
+                    ownerId = item.args.up_id,
+                    ownerName = item.args.up_name,
+                ).let { VideoInfoFragment.createArguments(it) }
+
                 Navigation.findNavController(view)
                     .navigate(VideoInfoFragment.actionId, args)
             }

@@ -813,9 +813,8 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
         }
         if (mChangePosition) {
             val totalTimeDuration = duration
-            mSeekTimePosition =
+            mSeekTimePosition = (mDownPosition + deltaX * 44 / mSeekRatio).toLong()  // 每33个px？是1s
 //                (mDownPosition + deltaX * totalTimeDuration / curWidth / mSeekRatio).toLong()
-                            (mDownPosition + deltaX * 33 / mSeekRatio).toLong()  // 每33个px？是1s
             if (mSeekTimePosition < 0) { mSeekTimePosition = 0 }
             if (mSeekTimePosition > totalTimeDuration) mSeekTimePosition = totalTimeDuration
             val seekTime = CommonUtil.stringForTime(mSeekTimePosition)

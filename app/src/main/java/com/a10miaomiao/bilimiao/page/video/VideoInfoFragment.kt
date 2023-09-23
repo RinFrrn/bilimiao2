@@ -89,19 +89,33 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                 type = NavType.StringType
                 nullable = false
             }
+            argument(MainNavArgs.video) {
+                type = NavType.ParcelableType(VideoPreLoadParam::class.java)
+                nullable = true
+            }
         }
 
         fun createArguments(
-            id: String
+            aid: String
         ): Bundle {
-            val type = if (id.indexOf("BV") == 0) {
+            val type = if (aid.indexOf("BV") == 0) {
                 VideoInfoFragment.TYPE_BV
             } else {
                 VideoInfoFragment.TYPE_AV
             }
             return bundleOf(
                 MainNavArgs.type to type,
-                MainNavArgs.id to id,
+                MainNavArgs.id to aid
+            )
+        }
+
+        fun createArguments(
+            video: VideoPreLoadParam
+        ): Bundle {
+            return bundleOf(
+                MainNavArgs.type to TYPE_AV,
+                MainNavArgs.id to video.aid,
+                MainNavArgs.video to video
             )
         }
     }
@@ -187,6 +201,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                 )
                 pm.show()
             }
+
             1 -> {
                 // TODO: move to tab
                 // 评论
@@ -196,6 +211,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                     nav.navigate(VideoCommentListFragment.actionId, args)
                 }
             }
+
             2 -> {
                 // 分享
                 if (info == null) {
@@ -213,6 +229,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                 }
                 requireActivity().startActivity(Intent.createChooser(shareIntent, "分享"))
             }
+
             3 -> {
                 // 收藏
                 if (info != null) {
@@ -224,6 +241,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                     nav.navigate(VideoAddFavoriteFragment.actionId, args)
                 }
             }
+
             4 -> {
                 // 投币
                 if (info != null) {
@@ -240,6 +258,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                     nav.navigate(VideoCoinFragment.actionId, args)
                 }
             }
+
             5 -> {
                 // 点赞
                 viewModel.requestLike()
@@ -252,6 +271,10 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val preLoadParam = requireArguments().getParcelable<VideoPreLoadParam>(MainNavArgs.video)
+        preLoadParam?.let {
+            playVideo(it)
+        }
         return ui.root
     }
 
@@ -299,6 +322,19 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
         }
     }
 
+    private fun playVideo(video: VideoPreLoadParam) {
+        basePlayerDelegate.openPlayer(
+            VideoPlayerSource(
+                title = video.title,
+                coverUrl = video.cover,
+                aid = video.aid,
+                id = video.cid,
+                ownerId = video.ownerId,
+                ownerName = video.ownerName,
+            )
+        )
+    }
+
     private fun toSelfLink(view: View, url: String) {
         val urlInfo = BiliUrlMatcher.findIDByUrl(url)
         val urlType = urlInfo[0]
@@ -313,6 +349,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                 Navigation.findNavController(view)
                     .navigate(actionId, args)
             }
+
             else -> {
                 BiliUrlMatcher.toUrlLink(view, url)
             }
@@ -333,7 +370,8 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
 
     private val handleMorePageClick = View.OnClickListener {
         viewModel.info?.let { info ->
-            val nav = Navigation.findNavController(requireActivity(), R.id.nav_bottom_sheet_fragment)
+            val nav =
+                Navigation.findNavController(requireActivity(), R.id.nav_bottom_sheet_fragment)
             val args = VideoPagesFragment.createArguments(
                 video = VideoPagesParam(
                     aid = info.aid,
@@ -371,7 +409,15 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
         val item = adapter.getItem(position)
         if (item is VideoRelateInfo) {
             if (item.goto == "av") {
-                val args = createArguments(item.aid!!)
+//                val args = createArguments(item.aid!!)
+                val args = VideoPreLoadParam(
+                    aid = item.aid!!,
+                    cid = item.cid.toString(),
+                    cover = item.pic,
+                    title = item.title,
+                    ownerId = item.owner!!.mid,
+                    ownerName = item.owner!!.name,
+                ).let { VideoInfoFragment.createArguments(it) }
                 Navigation.findNavController(view)
                     .navigate(actionId, args)
             } else {
@@ -406,9 +452,11 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                         }
                     }
                 }
+
                 LinkType.MENTION_TYPE -> {
 //                toast("你点击了@用户 内容是：$content")
                 }
+
                 LinkType.SELF -> {
                     toSelfLink(view, selfContent)
                 }
@@ -574,7 +622,8 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                                 +textView {
                                     textSize = 12f
                                     setTextColor(config.foregroundAlpha45Color)
-                                    _text = "发表于 " + NumberUtil.converCTime(viewModel.info?.pubdate)
+                                    _text =
+                                        "发表于 " + NumberUtil.converCTime(viewModel.info?.pubdate)
                                 }
                             }
 
