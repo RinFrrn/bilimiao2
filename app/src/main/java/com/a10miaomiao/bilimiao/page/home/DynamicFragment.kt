@@ -189,7 +189,7 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
     private val upListItemUi = miaoBindingItemUi<DynamicViewModel.UpListItem> { item, index ->
         val isSelected = viewModel.selectedUpUid == item.uid
 
-        dynamicUpItem(item.face, item.name, isSelected, item.hasUpdate).apply {
+        dynamicUpItem(item.face, item.name, isSelected, item.hasUpdate, RecyclerView.HORIZONTAL).apply {
             _tag = index
 
             miaoEffect(null) {
@@ -197,6 +197,18 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
             }
         }
     }
+
+//    private val upListItemUiV = miaoBindingItemUi<DynamicViewModel.UpListItem> { item, index ->
+//        val isSelected = viewModel.selectedUpUid == item.uid
+//
+//        dynamicUpItem(item.face, item.name, isSelected, item.hasUpdate).apply {
+//            _tag = index
+//
+//            miaoEffect(null) {
+//                setOnClickListener(handleUpClick)
+//            }
+//        }
+//    }
 
     val ui = miaoBindingUi {
         val windowStore = miaoStore<WindowStore>(viewLifecycleOwner, di)
@@ -294,7 +306,7 @@ class DynamicFragment : RecyclerViewFragment(), DIAware {
         @Orientation orientation: Int = RecyclerView.VERTICAL
     ): View = horizontalLayout {
         views {
-            +recyclerView {
+            +recyclerviewAtViewPager2 {
                 _miaoLayoutManage(
                     LinearLayoutManager(context, orientation, false)
                 )

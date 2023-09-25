@@ -132,6 +132,12 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
 
     private val basePlayerDelegate by instance<BasePlayerDelegate>()
 
+    private val preLoadInfo by lazy {
+        requireArguments().getParcelable<VideoPreLoadParam>(
+            MainNavArgs.video
+        )
+    }
+
     override val pageConfig = myPageConfig {
         val info = viewModel.info
         title = info?.let {
@@ -271,9 +277,10 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val preLoadParam = requireArguments().getParcelable<VideoPreLoadParam>(MainNavArgs.video)
-        preLoadParam?.let {
-            playVideo(it)
+        if (viewModel.info?.pages.isNullOrEmpty()) {
+            preLoadInfo?.let {
+                playVideo(it)
+            }
         }
         return ui.root
     }
@@ -468,7 +475,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
             layoutParams = lParams {
                 width = wrapContent
                 height = matchParent
-                rightMargin = dip(5)
+                rightMargin = dip(12)
             }
             val enabled = playerStore.state.cid != item.cid
             setBackgroundResource(R.drawable.shape_corner)
@@ -558,9 +565,10 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
 
     val upperItemUi = miaoBindingItemUi<VideoStaffInfo> { item, index ->
         verticalLayout {
-            layoutParams = ViewGroup.LayoutParams(dip(64), wrapContent)
-            topPadding = dip(10)
-            bottomPadding = dip(5)
+            layoutParams = ViewGroup.LayoutParams(dip(76), wrapContent)
+//            topPadding = dip(10)
+//            bottomPadding = dip(5)
+            padding = dip(4)
             gravity = Gravity.CENTER
             setBackgroundResource(config.selectableItemBackground)
 
@@ -574,6 +582,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                 }
 
                 +textView {
+                    topPadding = dip(8)
                     setTextColor(config.foregroundColor)
                     gravity = Gravity.CENTER
                     maxLines = 1
@@ -602,33 +611,35 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                     setBackgroundResource(config.selectableItemBackground)
                     setOnClickListener(handleUpperClick)
                     _show = !isMutableUpper
+                    gravity = gravityCenterVertical
 
                     views {
                         +rcImageView {
                             isCircle = true
                             _network(viewModel.info?.owner?.face, "@200w_200h")
                         }..lParams {
-                            height = dip(36)
-                            width = dip(36)
+                            height = dip(28)
+                            width = dip(28)
                         }
 
-                        +verticalLayout {
+                        +horizontalLayout {
 
                             views {
                                 +textView {
                                     setTextColor(config.foregroundColor)
-                                    _text = viewModel.info?.owner?.name ?: ""
+                                    textSize = 15f
+                                    _text = viewModel.info?.owner?.name ?: preLoadInfo?.ownerName ?: ""
                                 }
-                                +textView {
-                                    textSize = 12f
-                                    setTextColor(config.foregroundAlpha45Color)
-                                    _text =
-                                        "发表于 " + NumberUtil.converCTime(viewModel.info?.pubdate)
-                                }
+//                                +textView {
+//                                    leftPadding = dip(8)
+//                                    setTextColor(config.foregroundAlpha45Color)
+//                                    _text = viewModel.info?.owner
+////                                        "发表于" + NumberUtil.converCTime(viewModel.info?.pubdate)
+//                                }
                             }
 
                         }..lParams {
-                            leftMargin = dip(8)
+                            leftMargin = dip(12)
                         }
                     }
                 }..lParams {
@@ -652,14 +663,14 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                     }
                 }
 
-                +textView {
-                    _show = isMutableUpper
-                    textSize = 12f
-                    setTextColor(config.foregroundAlpha45Color)
-                    _text = "发表于 " + NumberUtil.converCTime(viewModel.info?.pubdate)
-                }..lParams {
-                    topMargin = dip(10)
-                }
+//                +textView {
+//                    _show = isMutableUpper
+//                    textSize = 12f
+//                    setTextColor(config.foregroundAlpha45Color)
+//                    _text = "发表于 " + NumberUtil.converCTime(viewModel.info?.pubdate)
+//                }..lParams {
+//                    topMargin = dip(10)
+//                }
             }
 
         }
@@ -676,7 +687,8 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                         +textView {
                             setBackgroundResource(config.selectableItemBackground)
 //                            backgroundColor = config.blockBackgroundColor
-                            verticalPadding = dip(4)
+                            topPadding = dip(3)
+                            bottomPadding = dip(4)
                             horizontalPadding = dip(8)
                             _text = item.tag_name
                         }
@@ -716,9 +728,10 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                 +upperView()..lParams {
                     width = matchParent
                     height = wrapContent
-                    topMargin = dip(2)
-                    bottomMargin = dip(8)
+                    topMargin = dip(4)
                 }
+
+                +space()..lParams(matchParent, dip(8))
 
                 // 视频标题
                 +horizontalLayout {
@@ -737,80 +750,73 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                             views {
                                 // 标题
                                 +textView {
-                                    textSize = 16f
+                                    textSize = 18f
                                     ellipsize = TextUtils.TruncateAt.END
                                     maxLines = 4
                                     setTextColor(config.foregroundColor)
-                                    _text = videoInfo?.title ?: ""
+                                    _text = videoInfo?.title ?: preLoadInfo?.title ?: ""
                                 }..lParams {
-                                    weight = 1f
                                     bottomMargin = dip(2)
                                 }
 
                                 // 播放量
                                 +horizontalLayout {
+                                    gravity = Gravity.CENTER_VERTICAL
 
                                     views {
 
                                         +imageView {
                                             imageTintList =
                                                 ColorStateList.valueOf(config.foregroundAlpha45Color)
-                                            setImageResource(R.drawable.ic_info_views)
-                                        }..lParams(dip(14), dip(14)) {
-                                            gravity = Gravity.CENTER
-                                        }
+                                            setImageResource(R.mipmap.ic_card_play)
+                                        }..lParams(dip(14), dip(14))
                                         +textView {
+                                            lines = 1
                                             textSize = 12f
                                             setTextColor(config.foregroundAlpha45Color)
                                             _text =
                                                 NumberUtil.converString(videoInfo?.stat?.view ?: "")
                                         }..lParams {
-                                            leftMargin = dip(3)
-                                            rightMargin = dip(16)
+                                            leftMargin = dip(2)
+                                            rightMargin = dip(12)
                                         }
 
                                         +imageView {
                                             imageTintList =
                                                 ColorStateList.valueOf(config.foregroundAlpha45Color)
-                                            setImageResource(R.drawable.ic_info_danmakus)
-                                        }..lParams(dip(14), dip(14)) {
-                                            gravity = Gravity.CENTER
-                                        }
+                                            setImageResource(R.mipmap.ic_card_danmu)
+                                        }..lParams(dip(14), dip(14))
                                         +textView {
+                                            lines = 1
                                             textSize = 12f
                                             setTextColor(config.foregroundAlpha45Color)
                                             _text = NumberUtil.converString(
                                                 videoInfo?.stat?.danmaku ?: ""
                                             )
                                         }..lParams {
-                                            leftMargin = dip(3)
-                                            rightMargin = dip(16)
+                                            leftMargin = dip(2)
+                                            rightMargin = dip(12)
+                                        }
+
+                                        // 发布时间
+                                        +textView {
+                                            lines = 1
+                                            textSize = 12f
+                                            setTextColor(config.foregroundAlpha45Color)
+                                            _text = NumberUtil.converCTime(viewModel.info?.pubdate)
+                                        }..lParams {
+                                            weight = 1f
                                         }
                                     }
 
-                                }..lParams {
-                                    width = matchParent
-                                    height = wrapContent
-                                    gravity = Gravity.CENTER_VERTICAL
-                                }
+                                }..lParams(matchParent, wrapContent)
                             }
-                        }..lParams(matchParent, matchParent)
+                        }..lParams(matchParent, wrapContent)
 
 
                     }
-                }
-
-//                +upperView()..lParams {
-//                    width = matchParent
-//                    height = wrapContent
-//                    topMargin = dip(10)
-//                }
-
-                // 分p
-                +pageView()..lParams {
-                    width = matchParent
-                    height = dip(48)
-                    topMargin = dip(10)
+                }..lParams(matchParent, wrapContent) {
+                    bottomMargin = dip(8)
                 }
 
                 +expandableTextView {
@@ -823,12 +829,24 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                     setNeedMention(false)
                     isNeedSelf = true
                     setNeedConvertUrl(false)
-                    _setContent(viewModel.info?.desc ?: "")
+                    _setContent(viewModel.info?.desc?.takeIf { it.isNotBlank() } ?: "-")
                     linkClickListener = handleLinkClickListener
                 }..lParams {
                     width = matchParent
                     height = wrapContent
-                    topMargin = dip(10)
+                }
+
+//                +upperView()..lParams {
+//                    width = matchParent
+//                    height = wrapContent
+//                    topMargin = dip(10)
+//                }
+
+                // 分p
+                +pageView()..lParams {
+                    width = matchParent
+                    height = dip(48)
+                    topMargin = dip(16)
                 }
 
                 +tagsView()..lParams {

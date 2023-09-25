@@ -44,7 +44,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="44dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -81,11 +81,11 @@
 
             <ImageView
                 android:id="@+id/fullscreen"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:paddingRight="8dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="12dp"
                 android:src="@drawable/ic_player_portrait_fullscreen"
-                app:tint="@color/white" />
+                app:tint="@color/player_button_color" />
 
         </LinearLayout>
 
@@ -249,10 +249,11 @@
 
         <ImageView
             android:id="@+id/back"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:paddingLeft="10dp"
-            android:src="@drawable/ic_close_white_24dp" />
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_close_white_24dp"
+            app:tint="@color/player_button_color" />
 
         <TextView
             android:id="@+id/title"
@@ -261,7 +262,6 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:paddingLeft="10dp"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
@@ -269,7 +269,7 @@
             android:id="@+id/play_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
+            android:layout_marginStart="10dp"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:gravity="center"
             android:orientation="horizontal">
@@ -289,32 +289,33 @@
                 android:layout_height="wrap_content"
                 android:letterSpacing="0.1"
                 android:text="1.0×"
-                android:textColor="@android:color/white"
+                android:textColor="@color/player_button_color"
                 android:textSize="16sp" />
 
         </LinearLayout>
 
         <ImageView
             android:id="@+id/more"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:paddingRight="10dp"
-            android:src="@drawable/ic_more_vert_white_24dp" />
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="12dp"
+            android:src="@drawable/ic_more_vert_white_24dp"
+            app:tint="@color/player_button_color" />
 
     </LinearLayout>
 
     <moe.codeest.enviews.ENDownloadView
         android:id="@+id/loading"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:visibility="invisible" />
 
     <moe.codeest.enviews.ENPlayView
         android:id="@+id/start"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical" />
@@ -379,23 +380,24 @@
         android:id="@+id/speed_tips"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/shape_player_speed_tips_bg"
         android:layout_centerHorizontal="true"
-        android:padding="10dp"
         android:layout_marginTop="40dp"
+        android:background="@drawable/shape_player_speed_tips_bg"
+        android:padding="10dp"
         android:visibility="gone">
+
         <ImageView
             android:id="@+id/speed_tips_icon"
             android:layout_width="40dp"
             android:layout_height="20dp"
             android:layout_marginRight="5dp"
-            android:src="@drawable/shape_player_speed_tips_icon"
-            />
+            android:src="@drawable/shape_player_speed_tips_icon" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2倍速播放中"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white" />
     </LinearLayout>
 
 </RelativeLayout>

@@ -42,6 +42,9 @@ class DoubleColumnAutofitLayout@JvmOverloads constructor(
 
     var dividerSize: Int = 0
 
+    private var isExpanded = false
+    var onWidthChange: ((Boolean) -> Unit)? = null
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         DebugMiao.log("onSizeChanged1")
@@ -49,7 +52,9 @@ class DoubleColumnAutofitLayout@JvmOverloads constructor(
         var cViewId = contentViewId ?: return
         var cView = findViewById<ViewGroup>(cViewId) ?: return
         DebugMiao.log("onSizeChanged2")
-        if (w >= expandWidth) {
+
+        val isExpanded = w >= expandWidth
+        if (isExpanded) {
             if (cView.childCount > 0 && cView.getChildAt(0) == lView) {
                 DebugMiao.log("onSizeChanged3")
                 cView.removeViewAt(0)
@@ -78,6 +83,7 @@ class DoubleColumnAutofitLayout@JvmOverloads constructor(
                 cView.addView(lView, 0)
             }
         }
+        onWidthChange?.invoke(isExpanded)
     }
 
 //    override fun onViewAdded(view: View) {

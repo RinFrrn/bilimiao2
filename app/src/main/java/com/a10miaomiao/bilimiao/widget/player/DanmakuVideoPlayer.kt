@@ -295,7 +295,7 @@ class DanmakuVideoPlayer : StandardGSYVideoPlayer {
             duration = 200
             interpolator = CustomPathInterpolator.SheetCurve
         }).addTransition(ChangeBounds().apply {
-            duration = 200
+            duration = 400
             interpolator = CustomPathInterpolator.SmoothCurve
         })
         TransitionManager.beginDelayedTransition(this, set)

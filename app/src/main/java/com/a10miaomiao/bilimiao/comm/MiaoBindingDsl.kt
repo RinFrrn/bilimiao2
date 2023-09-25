@@ -53,6 +53,7 @@ fun ImageView._network(
             .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .transition(withCrossFade(200))
+            .placeholder(R.drawable.bg_image_placeholder)
 //            .placeholder(R.drawable.bili_default_image_tv)
             .dontAnimate()
             .into(this)

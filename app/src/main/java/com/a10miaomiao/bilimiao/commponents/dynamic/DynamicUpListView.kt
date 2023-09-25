@@ -3,6 +3,7 @@ package com.a10miaomiao.bilimiao.commponents.dynamic
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView.Orientation
 import cn.a10miaomiao.miao.binding.android.view._show
 import cn.a10miaomiao.miao.binding.android.widget._text
 import cn.a10miaomiao.miao.binding.android.widget._textColor
@@ -28,7 +29,7 @@ import splitties.views.dsl.material.materialCardView
 import splitties.views.gravityCenter
 import splitties.views.lines
 
-fun MiaoUI.dynamicUpItem(face: String, name: String, selected: Boolean, hasUpdate: Boolean): View = materialCardView {
+fun MiaoUI.dynamicUpItem(face: String, name: String, selected: Boolean, hasUpdate: Boolean, @Orientation orientation: Int): View = materialCardView {
     layoutParams = ViewGroup.MarginLayoutParams(matchParent, wrapContent).apply {
         setMargins(dip(16), dip(4), dip(4), dip(4))
     }
@@ -47,6 +48,7 @@ fun MiaoUI.dynamicUpItem(face: String, name: String, selected: Boolean, hasUpdat
                 +frameLayout {
 
                     views {
+                        // avatar
                         +rcImageView {
                             isCircle = true
                             _network(face)
@@ -56,6 +58,7 @@ fun MiaoUI.dynamicUpItem(face: String, name: String, selected: Boolean, hasUpdat
                             gravity = gravityCenter
                         }
 
+                        // update dot
                         +verticalLayout {
                             _show = hasUpdate
                             backgroundColor = config.themeColor
@@ -72,6 +75,7 @@ fun MiaoUI.dynamicUpItem(face: String, name: String, selected: Boolean, hasUpdat
                     rightMargin = dip(12)
                 }
 
+                // name
                 +textView {
                     _text = name
                     lines = 1
