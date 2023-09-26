@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.a10miaomiao.bilimiao.comm.CustomPathInterpolator
 import com.a10miaomiao.bilimiao.widget.comm.ScaffoldView
 import splitties.dimensions.dip
 
@@ -76,7 +77,8 @@ class ContentBehavior : CoordinatorLayout.Behavior<View> {
         height: Float,
     ) {
         child.animate().apply {
-            duration = 200
+            duration = 500
+            interpolator = CustomPathInterpolator.SheetCurve
             translationY(height)
         }.start()
     }

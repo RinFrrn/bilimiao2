@@ -13,6 +13,8 @@
     <string name="theme_purple">PurpleTheme</string>
     <string name="theme_purple_DayNight">PurpleTheme.DayNight</string>
 
+    <string name="theme_pink_material3">PinkTheme.Material3</string>
+
     <style name="PinkTheme" parent="Theme.Bilimiao">
         <item name="themeName">@string/theme_pink</item>
         <!-- Primary brand color. -->
@@ -135,11 +137,7 @@
         <item name="colorSecondaryVariant">@color/purple</item>
     </style>
 
-    <style name="MaterialYouTheme" parent="Theme.Bilimiao">
-    </style>
+    <style name="MaterialYouTheme" parent="Theme.Bilimiao"></style>
 
-    <style name="MaterialYouTheme.DayNight" parent="Theme.DayNight.Bilimiao">
-    </style>
-
-
+    <style name="MaterialYouTheme.DayNight" parent="Theme.DayNight.Bilimiao"></style>
 </resources>

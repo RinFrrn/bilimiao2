@@ -603,7 +603,7 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
     fun MiaoUI.upperView(): View {
         return verticalLayout {
 
-            val isMutableUpper = viewModel.info?.staff?.isEmpty() == false
+            val isMutableUpper = !viewModel.info?.staff.isNullOrEmpty()
 
             views {
                 // 单个up主信息
@@ -618,8 +618,8 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                             isCircle = true
                             _network(viewModel.info?.owner?.face, "@200w_200h")
                         }..lParams {
-                            height = dip(28)
-                            width = dip(28)
+                            height = dip(32)
+                            width = dip(32)
                         }
 
                         +horizontalLayout {

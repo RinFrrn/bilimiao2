@@ -11,6 +11,8 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat.offsetLeftAndRight
 import androidx.core.view.ViewCompat.offsetTopAndBottom
 import androidx.core.view.get
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import com.a10miaomiao.bilimiao.comm.CustomPathInterpolator
 import com.a10miaomiao.bilimiao.widget.comm.ScaffoldView
 import com.a10miaomiao.bilimiao.widget.player.DanmakuVideoPlayer
 import splitties.dimensions.dip
@@ -309,9 +311,9 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
         addAnimation(
             AlphaAnimation(0f, 1f)
         )
-        interpolator = DecelerateInterpolator()
+        interpolator = CustomPathInterpolator.SheetCurve//DecelerateInterpolator()
         repeatMode = Animation.REVERSE
-        duration = 200
+        duration = 500
     }
 
     // 隐藏动画
@@ -327,9 +329,9 @@ class PlayerBehavior : CoordinatorLayout.Behavior<View> {
         addAnimation(
             AlphaAnimation(1f, 0f)
         )
-        interpolator = AccelerateInterpolator()
+        interpolator = CustomPathInterpolator.SheetCurve//AccelerateInterpolator()
         repeatMode = Animation.REVERSE
-        duration = 200
+        duration = 500
     }
 
     private fun startShowAnimation(child: View) {

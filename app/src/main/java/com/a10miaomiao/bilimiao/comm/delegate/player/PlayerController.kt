@@ -55,7 +55,10 @@ class PlayerController(
 
     private fun getFullMode(): String {
         val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
-        return prefs.getString(VideoSettingFragment.PLAYER_FULL_MODE, VideoSettingFragment.KEY_AUTO)!!
+        return prefs.getString(
+            VideoSettingFragment.PLAYER_FULL_MODE,
+            VideoSettingFragment.KEY_AUTO
+        )!!
     }
 
     fun initController() = views.videoPlayer.run {
@@ -95,8 +98,10 @@ class PlayerController(
 
                         views.videoPlayer.setSpeed(targetSpeed, true)
                         vibratorUtil.vibrate(VibrationEffect.EFFECT_CLICK)
-                        longPressingPopTip = PopTip.show("${targetSpeed.toInt()}×").showTop().showAlways()
+                        longPressingPopTip =
+                            PopTip.show("${targetSpeed.toInt()}×").showTop().showAlways()
                     }
+
                     else -> {
                         val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
                         val defaultSpeed = prefs.getFloat("player_speed", 1f)
@@ -107,22 +112,23 @@ class PlayerController(
                     }
                 }
             }
+
             override fun onSwipe(direction: GestureRecognizer.SwipeDirection) {
                 when (direction) {
-                    GestureRecognizer.SwipeDirection.UP -> if (scaffoldApp.fullScreenPlayer.not()) {
-                        fullScreen(getFullMode())
-                        vibratorUtil.vibrate(VibrationEffect.EFFECT_TICK)
-//                        PopTip.show(R.drawable.ic_player_portrait_fullscreen, "进入全屏").showTop()
-//                            .autoDismiss(600)
-                    }
-                    GestureRecognizer.SwipeDirection.DOWN -> if (scaffoldApp.fullScreenPlayer) {
+                    GestureRecognizer.SwipeDirection.UP -> if (scaffoldApp.fullScreenPlayer) {
                         smallScreen()
                         vibratorUtil.vibrate(VibrationEffect.EFFECT_TICK)
-//                        PopTip.show(R.drawable.ic_close_fullscreen_24, "退出全屏").showTop()
-//                            .autoDismiss(600)
+                    } else {
+                        closeVideo()
+                    }
+
+                    GestureRecognizer.SwipeDirection.DOWN -> if (scaffoldApp.fullScreenPlayer.not()) {
+                        fullScreen(getFullMode())
+                        vibratorUtil.vibrate(VibrationEffect.EFFECT_TICK)
                     } else {
                         enterPiP()
                     }
+
                     GestureRecognizer.SwipeDirection.LEFT -> {}
                     GestureRecognizer.SwipeDirection.RIGHT -> {}
                 }
@@ -153,6 +159,7 @@ class PlayerController(
                     ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                 }
             }
+
             else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         }
         statusBarHelper.isShowStatus = views.videoPlayer.topContainer.visibility == View.VISIBLE
@@ -235,16 +242,24 @@ class PlayerController(
         val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
         onlyFull = false
         if (scaffoldApp.orientation == ScaffoldView.VERTICAL) {
-            val isPlayerVerticalDefaultFull = prefs.getBoolean(VideoSettingFragment.PLAYER_VERTICAL_DEFAULT_FULL, false)
+            val isPlayerVerticalDefaultFull =
+                prefs.getBoolean(VideoSettingFragment.PLAYER_VERTICAL_DEFAULT_FULL, false)
             if (isPlayerVerticalDefaultFull) {
-                val fullMode = prefs.getString(VideoSettingFragment.PLAYER_FULL_MODE, VideoSettingFragment.KEY_SENSOR_LANDSCAPE)!!
+                val fullMode = prefs.getString(
+                    VideoSettingFragment.PLAYER_FULL_MODE,
+                    VideoSettingFragment.KEY_SENSOR_LANDSCAPE
+                )!!
                 fullScreen(fullMode)
                 onlyFull = true
             }
         } else {
-            val isPlayerHorizontalDefaultFull = prefs.getBoolean(VideoSettingFragment.PLAYER_HORIZONTAL_DEFAULT_FULL, false)
+            val isPlayerHorizontalDefaultFull =
+                prefs.getBoolean(VideoSettingFragment.PLAYER_HORIZONTAL_DEFAULT_FULL, false)
             if (isPlayerHorizontalDefaultFull) {
-                val fullMode = prefs.getString(VideoSettingFragment.PLAYER_FULL_MODE, VideoSettingFragment.KEY_SENSOR_LANDSCAPE)!!
+                val fullMode = prefs.getString(
+                    VideoSettingFragment.PLAYER_FULL_MODE,
+                    VideoSettingFragment.KEY_SENSOR_LANDSCAPE
+                )!!
                 fullScreen(fullMode)
                 onlyFull = true
             }
@@ -342,10 +357,12 @@ class PlayerController(
             R.id.mini_window -> {
                 enterPiP()
             }
+
             R.id.video_setting -> {
                 val nav = activity.findNavController(R.id.nav_bottom_sheet_fragment)
                 nav.navigate(Uri.parse("bilimiao://setting/video"))
             }
+
             R.id.danmuku_setting -> {
                 val nav = activity.findNavController(R.id.nav_bottom_sheet_fragment)
                 nav.navigate(Uri.parse("bilimiao://setting/danmaku"))
@@ -402,7 +419,8 @@ class PlayerController(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && it.isInPictureInPictureMode) {
                 try {
                     it.updatePictureInPictureActions(state)
-                } catch (e: Exception) { }
+                } catch (e: Exception) {
+                }
             }
         }
         PlayerService.selfInstance?.playerState = state

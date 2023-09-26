@@ -85,5 +85,7 @@
         <item name="colorOnSurface">@color/white</item>
     </style>
 
-
+    <style name="PinkTheme.Material3" parent="Theme.Bilimiao">
+        <item name="themeName">@string/theme_pink_material3</item>
+    </style>
 </resources>

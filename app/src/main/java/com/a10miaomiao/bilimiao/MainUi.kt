@@ -130,7 +130,7 @@ class MainUi(override val ctx: Context) : Ui, BottomSheetUi {
 
     override val root = view<ScaffoldView>() {
         orientation = resources.configuration.orientation
-        backgroundColor = 0xFFF2F2F2L.toInt()
+        backgroundColor = config.windowBackgroundColor
 
         addView(mContainerView, lParams {
             behavior = ContentBehavior(ctx, null)
