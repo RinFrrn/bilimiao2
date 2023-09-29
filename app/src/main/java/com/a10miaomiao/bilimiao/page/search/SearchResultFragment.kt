@@ -34,6 +34,37 @@ import splitties.views.dsl.core.matchParent
 import splitties.views.dsl.core.verticalLayout
 import splitties.views.dsl.core.wrapContent
 
+//20:01:23.185  E  FATAL EXCEPTION: main
+//Process: cn.a10miaomiao.bilimiao.dev, PID: 30745
+//java.lang.IllegalStateException: Can't access ViewModels from detached fragment
+//at androidx.fragment.app.Fragment.getViewModelStore(Fragment.java:414)
+//at com.a10miaomiao.bilimiao.comm.CommDslKt$diViewModel$1.invoke(CommDsl.kt:75)
+//at com.a10miaomiao.bilimiao.comm.CommDslKt$diViewModel$1.invoke(CommDsl.kt:75)
+//at androidx.lifecycle.ViewModelLazy.getValue(ViewModelLazy.kt:48)
+//at androidx.lifecycle.ViewModelLazy.getValue(ViewModelLazy.kt:35)
+//at com.a10miaomiao.bilimiao.page.search.result.VideoResultFragment.getViewModel(VideoResultFragment.kt:114)
+//at com.a10miaomiao.bilimiao.page.search.result.VideoResultFragment.access$getViewModel(VideoResultFragment.kt:43)
+//at com.a10miaomiao.bilimiao.page.search.result.VideoResultFragment$menus$1.invoke(VideoResultFragment.kt:59)
+//at com.a10miaomiao.bilimiao.page.search.result.VideoResultFragment$menus$1.invoke(VideoResultFragment.kt:57)
+//at com.a10miaomiao.bilimiao.comm.mypage.DslKt.myMenuItem(dsl.kt:15)
+//at com.a10miaomiao.bilimiao.page.search.result.VideoResultFragment.getMenus(VideoResultFragment.kt:57)
+//at com.a10miaomiao.bilimiao.page.search.SearchResultFragment$pageConfig$1.invoke(SearchResultFragment.kt:64)
+//at com.a10miaomiao.bilimiao.page.search.SearchResultFragment$pageConfig$1.invoke(SearchResultFragment.kt:55)
+//at com.a10miaomiao.bilimiao.comm.mypage.DslKt$myPageConfig$1.invoke(dsl.kt:8)
+//at com.a10miaomiao.bilimiao.comm.mypage.DslKt$myPageConfig$1.invoke(dsl.kt:6)
+//at com.a10miaomiao.bilimiao.comm.mypage.MyPageConfig.getConfigInfo(MyPageConfig.kt:17)
+//at com.a10miaomiao.bilimiao.comm.mypage.MyPageConfig.notifyConfigChanged(MyPageConfig.kt:43)
+//at com.a10miaomiao.bilimiao.page.search.SearchResultFragment.initView$lambda-0(SearchResultFragment.kt:128)
+//at com.a10miaomiao.bilimiao.page.search.SearchResultFragment.$r8$lambda$flDD8Z7s3-3FuukPkRMDG89OlWc(Unknown Source:0)
+//at com.a10miaomiao.bilimiao.page.search.SearchResultFragment$$ExternalSyntheticLambda0.run(Unknown Source:2)
+//at android.os.Handler.handleCallback(Handler.java:942)
+//at android.os.Handler.dispatchMessage(Handler.java:99)
+//at android.os.Looper.loopOnce(Looper.java:226)
+//at android.os.Looper.loop(Looper.java:313)
+//at android.app.ActivityThread.main(ActivityThread.java:8805)
+//at java.lang.reflect.Method.invoke(Native Method)
+//at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:604)
+//at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1067)
 class SearchResultFragment : Fragment(), DIAware, MyPage, ViewPager.OnPageChangeListener {
 
     companion object : FragmentNavigatorBuilder() {

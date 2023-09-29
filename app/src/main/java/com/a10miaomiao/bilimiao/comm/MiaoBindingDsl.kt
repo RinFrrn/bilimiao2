@@ -35,7 +35,8 @@ fun ImageView.network(
     }
     Glide.with(context)
         .loadImageUrl(url, suffix)
-        .centerCrop()
+        .fitCenter()
+//        .centerCrop()
 //            .transform(GlideRoundTransform(context))
         .diskCacheStrategy(DiskCacheStrategy.ALL)
 //        .placeholder(R.drawable.bili_default_image_tv)

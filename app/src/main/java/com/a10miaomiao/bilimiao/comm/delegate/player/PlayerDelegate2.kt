@@ -301,7 +301,8 @@ class PlayerDelegate2(
 
     private fun setThumbImageView(coverUrl: String) {
         views.videoPlayer.thumbImageView = ImageView(activity).apply {
-            scaleType = ImageView.ScaleType.CENTER_CROP
+            scaleType = ImageView.ScaleType.FIT_CENTER
+//            scaleType = ImageView.ScaleType.CENTER_CROP
             network(coverUrl)
         }
     }
