@@ -1,17 +1,21 @@
-package com.a10miaomiao.bilimiao.comm.delegate.player.model
+package com.a10miaomiao.bilimiao.comm.delegate.player
 
-import com.a10miaomiao.bilimiao.comm.delegate.player.BasePlayerSource
+
+import android.os.Parcelable
+import com.a10miaomiao.bilimiao.comm.delegate.player.entity.DashSource
+import com.a10miaomiao.bilimiao.comm.delegate.player.entity.PlayerSourceIds
 import com.a10miaomiao.bilimiao.comm.delegate.player.entity.PlayerSourceInfo
 import com.a10miaomiao.bilimiao.comm.delegate.player.entity.SubtitleSourceInfo
-import com.a10miaomiao.bilimiao.comm.exception.DabianException
 import com.a10miaomiao.bilimiao.comm.entity.ResultInfo
 import com.a10miaomiao.bilimiao.comm.entity.player.PlayerV2Info
+import com.a10miaomiao.bilimiao.comm.exception.DabianException
 import com.a10miaomiao.bilimiao.comm.network.ApiHelper
 import com.a10miaomiao.bilimiao.comm.network.BiliApiService
 import com.a10miaomiao.bilimiao.comm.network.MiaoHttp
 import com.a10miaomiao.bilimiao.comm.network.MiaoHttp.Companion.gson
 import com.a10miaomiao.bilimiao.comm.utils.CompressionTools
 import com.a10miaomiao.bilimiao.comm.utils.UrlUtil
+import kotlinx.android.parcel.Parcelize
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser
 import master.flame.danmaku.danmaku.parser.BiliDanmukuParser
@@ -28,6 +32,8 @@ class BangumiPlayerSource(
     override val ownerId: String,
     override val ownerName: String,
 ): BasePlayerSource() {
+
+    var episodes = emptyList<EpisodeInfo>()
 
     override suspend fun getPlayerUrl(quality: Int, fnval: Int): PlayerSourceInfo {
         val res = proxyServer?.let {
@@ -74,6 +80,14 @@ class BangumiPlayerSource(
 
             }
         }
+    }
+
+    override fun getSourceIds(): PlayerSourceIds {
+        return PlayerSourceIds(
+            cid = id,
+            sid = sid,
+            epid = epid,
+        )
     }
 
     override suspend fun getSubtitles(): List<SubtitleSourceInfo> {
@@ -149,4 +163,42 @@ class BangumiPlayerSource(
             e.printStackTrace()
         }
     }
+
+    override fun next(): BasePlayerSource? {
+        val index = episodes.indexOfFirst { it.cid == id }
+        val nextIndex = index + 1
+        if (nextIndex in episodes.indices) {
+            val nextEpisode = episodes[nextIndex]
+            val nextPlayerSource = BangumiPlayerSource(
+                sid = sid,
+                epid = nextEpisode.epid,
+                aid = nextEpisode.aid,
+                id = nextEpisode.cid,
+                title = nextEpisode.index_title.ifBlank { nextEpisode.index },
+                coverUrl = nextEpisode.cover,
+                ownerId = ownerId,
+                ownerName = ownerName,
+            )
+            nextPlayerSource.episodes = episodes
+            return nextPlayerSource
+        }
+        return null
+    }
+
+    data class EpisodeInfo(
+        val epid: String,
+        val aid: String,
+        val cid: String,
+        val cover: String,
+        val index: String,
+        val index_title: String,
+        val badge: String,
+        val badge_info: EpisodeBadgeInfo,
+    )
+
+    data class EpisodeBadgeInfo(
+        val bg_color: String,
+        val bg_color_night: String,
+        val text: String,
+    )
 }

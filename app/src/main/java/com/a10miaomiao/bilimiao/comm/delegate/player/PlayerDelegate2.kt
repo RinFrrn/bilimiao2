@@ -5,10 +5,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.view.View
+import android.view.DisplayCutout
 import android.view.WindowManager
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -27,8 +26,6 @@ import androidx.media3.exoplayer.source.MergingMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.a10miaomiao.bilimiao.comm.delegate.helper.PicInPicHelper
 import com.a10miaomiao.bilimiao.comm.delegate.player.entity.PlayerSourceInfo
-import com.a10miaomiao.bilimiao.comm.delegate.player.model.BangumiPlayerSource
-import com.a10miaomiao.bilimiao.comm.delegate.player.model.VideoPlayerSource
 import com.a10miaomiao.bilimiao.comm.delegate.theme.ThemeDelegate
 import com.a10miaomiao.bilimiao.comm.dialogx.showTop
 import com.a10miaomiao.bilimiao.comm.entity.player.SubtitleJsonInfo
@@ -38,6 +35,7 @@ import com.a10miaomiao.bilimiao.comm.network
 import com.a10miaomiao.bilimiao.comm.network.MiaoHttp
 import com.a10miaomiao.bilimiao.comm.network.MiaoHttp.Companion.gson
 import com.a10miaomiao.bilimiao.comm.proxy.ProxyServerInfo
+import com.a10miaomiao.bilimiao.comm.store.PlayerStore
 import com.a10miaomiao.bilimiao.comm.store.UserStore
 import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
 import com.a10miaomiao.bilimiao.comm.utils.NumberUtil
@@ -45,7 +43,6 @@ import com.a10miaomiao.bilimiao.comm.utils.UrlUtil
 import com.a10miaomiao.bilimiao.config.config
 import com.a10miaomiao.bilimiao.page.setting.VideoSettingFragment
 import com.a10miaomiao.bilimiao.service.PlayerService
-import com.a10miaomiao.bilimiao.store.PlayerStore
 import com.a10miaomiao.bilimiao.widget.comm.getScaffoldView
 import com.a10miaomiao.bilimiao.widget.player.DanmakuVideoPlayer
 import com.a10miaomiao.bilimiao.widget.player.media3.ExoMediaSourceInterceptListener
@@ -107,8 +104,8 @@ class PlayerDelegate2(
     var speed = 1f // 播放速度
     private var lastPosition = 0L
     private val playerCoroutineScope = PlayerCoroutineScope()
-    private var playerSource: BasePlayerSource? = null
-        set(value) {
+    var playerSource: BasePlayerSource? = null
+        private set(value) {
             field = value
             if (value != null) {
                 playerStore.setPlayerSource(value)
@@ -520,6 +517,15 @@ class PlayerDelegate2(
 
         // 播放器是否默认全屏播放
         controller.checkIsPlayerDefaultFull()
+        if (source is VideoPlayerSource && source.pages.size > 1) {
+            views.videoPlayer.setExpandButtonText("分P")
+            views.videoPlayer.showExpandButton()
+        } else if (source is BangumiPlayerSource && source.episodes.size > 1) {
+            views.videoPlayer.setExpandButtonText("剧集")
+            views.videoPlayer.showExpandButton()
+        } else {
+            views.videoPlayer.hideExpandButton()
+        }
     }
 
     override fun closePlayer() {
@@ -529,6 +535,7 @@ class PlayerDelegate2(
         playerSource = null
 
         views.videoPlayer.release()
+        views.videoPlayer.hideExpandButton()
         lastPosition = 0L
 
         // 设置通知栏控制器
@@ -541,8 +548,8 @@ class PlayerDelegate2(
         return views.videoPlayer.isInPlayingState
     }
 
-    override fun setWindowInsets(left: Int, top: Int, right: Int, bottom: Int) {
-        views.videoPlayer.setWindowInsets(left, top, right, bottom)
+    override fun setWindowInsets(left: Int, top: Int, right: Int, bottom: Int, displayCutout: DisplayCutout?) {
+        views.videoPlayer.setWindowInsets(left, top, right, bottom, displayCutout)
     }
 
     override fun updateDanmukuSetting() {
