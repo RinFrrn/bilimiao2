@@ -1,6 +1,7 @@
-package com.a10miaomiao.bilimiao.comm.delegate.player.model
+package com.a10miaomiao.bilimiao.comm.delegate.player
 
-import com.a10miaomiao.bilimiao.comm.delegate.player.BasePlayerSource
+import com.a10miaomiao.bilimiao.comm.delegate.player.entity.DashSource
+import com.a10miaomiao.bilimiao.comm.delegate.player.entity.PlayerSourceIds
 import com.a10miaomiao.bilimiao.comm.delegate.player.entity.PlayerSourceInfo
 import com.a10miaomiao.bilimiao.comm.delegate.player.entity.SubtitleSourceInfo
 import com.a10miaomiao.bilimiao.comm.entity.ResultInfo
@@ -24,6 +25,8 @@ class VideoPlayerSource(
     override val ownerId: String,
     override val ownerName: String,
 ): BasePlayerSource() {
+
+    var pages = emptyList<PageInfo>()
 
     override suspend fun getPlayerUrl(quality: Int, fnval: Int): PlayerSourceInfo {
 //        val req = Playurl.PlayURLReq.newBuilder()
@@ -72,6 +75,13 @@ class VideoPlayerSource(
 
             }
         }
+    }
+
+    override fun getSourceIds(): PlayerSourceIds {
+        return PlayerSourceIds(
+            cid = id,
+            aid = aid,
+        )
     }
 
     override suspend fun getDanmakuParser(): BaseDanmakuParser? {
@@ -140,5 +150,29 @@ class VideoPlayerSource(
             e.printStackTrace()
         }
     }
+
+    override fun next(): BasePlayerSource? {
+        val index = pages.indexOfFirst { it.cid == id }
+        val nextIndex = index + 1
+        if (nextIndex in pages.indices) {
+            val nextPage = pages[nextIndex]
+            val nextPlayerSource = VideoPlayerSource(
+                title = nextPage.title,
+                coverUrl = coverUrl,
+                aid = aid,
+                id = nextPage.cid,
+                ownerId = ownerId,
+                ownerName = ownerName,
+            )
+            nextPlayerSource.pages = pages
+            return nextPlayerSource
+        }
+        return null
+    }
+
+    data class PageInfo(
+        val cid: String,
+        val title: String,
+    )
 
 }

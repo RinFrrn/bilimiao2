@@ -2,39 +2,39 @@ package com.a10miaomiao.bilimiao.comm.mypage
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.*
 import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
 
 class MyPageConfig(
     private val fragment: Fragment,
     private val getConfigInfo: (() -> MyPageConfigInfo),
-): LifecycleObserver {
+) {
 
     var setConfig: ((MyPageConfigInfo) -> Unit)? = null
 
     private val configInfo get() = getConfigInfo()
 
-    init {
-        fragment.lifecycle.addObserver(this)
-    }
+    private val lifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) {
+            super.onStart(owner)
+            if (setConfig == null) {
+                // 无奈之取，activity重启后fragment自动恢复后不会经过onAttachFragment方法，setConfig为空
+                val fragmentManager = fragment.parentFragmentManager
+                val clazz = FragmentManager::class.java
+                val method = clazz.getDeclaredMethod("dispatchOnAttachFragment", Fragment::class.java)
+                method.isAccessible = true
+                method.invoke(fragmentManager, fragment)
+            }
+        }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onStart() {
-        if (setConfig == null) {
-            // 无奈之取，activity重启后fragment自动恢复后不会经过onAttachFragment方法，setConfig为空
-            val fragmentManager = fragment.parentFragmentManager
-            val clazz = FragmentManager::class.java
-            val method = clazz.getDeclaredMethod("dispatchOnAttachFragment", Fragment::class.java)
-            method.isAccessible = true
-            method.invoke(fragmentManager, fragment)
+        override fun onResume(owner: LifecycleOwner) {
+            super.onResume(owner)
+            notifyConfigChanged()
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onResume() {
-        notifyConfigChanged()
+    init {
+        fragment.lifecycle.addObserver(lifecycleObserver)
     }
 
     fun notifyConfigChanged () {
