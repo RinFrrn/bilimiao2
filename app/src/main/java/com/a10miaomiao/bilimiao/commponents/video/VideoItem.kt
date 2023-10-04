@@ -14,6 +14,7 @@ import cn.a10miaomiao.miao.binding.miaoEffect
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.MiaoUI
 import com.a10miaomiao.bilimiao.comm._network
+import com.a10miaomiao.bilimiao.comm.compat.setDrawableStart
 import com.a10miaomiao.bilimiao.comm.utils.DebugMiao
 import com.a10miaomiao.bilimiao.comm.utils.HtmlTagHandler
 import com.a10miaomiao.bilimiao.comm.utils.NumberUtil
@@ -25,6 +26,8 @@ import splitties.dimensions.dip
 import splitties.views.bottomPadding
 import splitties.views.dsl.core.*
 import splitties.views.dsl.material.materialCardView
+import splitties.views.gravityCenterVertical
+import splitties.views.gravityStartCenter
 import splitties.views.imageResource
 import splitties.views.lines
 import splitties.views.padding
@@ -76,30 +79,17 @@ fun MiaoUI.videoItem(
                     }
 
                     // UP主
-                    +horizontalLayout {
-                        gravity = Gravity.CENTER_VERTICAL
+                    +textView {
                         _show = upperName != null
 
-                        views {
-                            +imageView {
-                                imageResource = R.mipmap.ic_card_up//R.drawable.icon_up
-                                imageTintList =
-                                    ColorStateList.valueOf(config.foregroundAlpha45Color)
-//                                apply(ViewStyle.roundRect(dip(5)))
-                            }..lParams {
-                                width = dip(16)
-                                height = dip(16)
-                                topMargin = dip(1)
-                                rightMargin = dip(2)
-                            }
+                        gravity = gravityCenterVertical
+                        setDrawableStart(R.mipmap.ic_card_up, dip(15), ColorStateList.valueOf(config.foregroundAlpha45Color))
+                        compoundDrawablePadding = dip(2)
 
-                            +textView {
-                                textSize = 14f
-                                setTextColor(config.foregroundAlpha45Color)
-                                maxLines = 1
-                                _text = upperName ?: ""
-                            }
-                        }
+                        textSize = 14f
+                        setTextColor(config.foregroundAlpha45Color)
+                        maxLines = 1
+                        _text = upperName ?: ""
                     }
 
                     // 备注
@@ -123,35 +113,23 @@ fun MiaoUI.videoItem(
                         _show = playNum != null || damukuNum != null
 
                         views {
-                            +imageView {
-                                imageResource =
-                                    R.mipmap.ic_card_play//R.drawable.ic_info_views//R.drawable.ic_play_circle_outline_black_24dp
-                                imageTintList =
-                                    ColorStateList.valueOf(config.foregroundAlpha45Color)
-                            }..lParams {
-                                width = dip(16)
-                                height = dip(16)
-                                topMargin = dip(1)
-                                rightMargin = dip(2)
-                            }
                             +textView {
+                                gravity = gravityCenterVertical
+                                setDrawableStart(R.mipmap.ic_card_play, dip(15), ColorStateList.valueOf(config.foregroundAlpha45Color))
+                                compoundDrawablePadding = dip(2)
+
                                 textSize = 14f
                                 setTextColor(config.foregroundAlpha45Color)
                                 _text = NumberUtil.converString(playNum ?: "0")
                             }
+
                             +space()..lParams(width = dip(10))
-                            +imageView {
-                                imageResource =
-                                    R.mipmap.ic_card_danmu//R.drawable.ic_info_danmakus//R.drawable.ic_subtitles_black_24dp
-                                imageTintList =
-                                    ColorStateList.valueOf(config.foregroundAlpha45Color)
-                            }..lParams {
-                                width = dip(16)
-                                height = dip(16)
-                                topMargin = dip(1)
-                                rightMargin = dip(2)
-                            }
+
                             +textView {
+                                gravity = gravityCenterVertical
+                                setDrawableStart(R.mipmap.ic_card_danmu, dip(15), ColorStateList.valueOf(config.foregroundAlpha45Color))
+                                compoundDrawablePadding = dip(2)
+
                                 textSize = 14f
                                 setTextColor(config.foregroundAlpha45Color)
                                 _text = NumberUtil.converString(damukuNum ?: "0")
@@ -231,37 +209,23 @@ fun MiaoUI.videoItemV(
                                 setPadding(dip(8), dip(4), dip(8), dip(4))
 
                                 views {
-                                    +imageView {
-                                        imageResource =
-                                            R.mipmap.ic_card_play//R.drawable.ic_play_circle_outline_black_24dp
-                                        imageTintList = ColorStateList.valueOf(config.white)
-                                    }..lParams {
-                                        width = dip(16)
-                                        height = dip(16)
-                                        topMargin = 1
-                                        rightMargin = dip(3)
-                                    }
                                     +textView {
+                                        gravity = gravityCenterVertical
+                                        setDrawableStart(R.mipmap.ic_card_play, dip(15), ColorStateList.valueOf(config.white))
+                                        compoundDrawablePadding = dip(2)
+
                                         textSize = 12f
                                         setTextColor(config.white)
                                         _text = NumberUtil.converString(playNum ?: "0")
                                     }
 
                                     +space()..lParams(width = dip(10))
-                                    +imageView {
-                                        imageResource =
-                                            R.mipmap.ic_card_danmu//R.drawable.ic_subtitles_black_24dp
-                                        imageTintList = ColorStateList.valueOf(config.white)
 
-                                        _show = damukuNum != null
-
-                                    }..lParams {
-                                        width = dip(16)
-                                        height = dip(16)
-                                        topMargin = 1
-                                        rightMargin = dip(3)
-                                    }
                                     +textView {
+                                        gravity = gravityCenterVertical
+                                        setDrawableStart(R.mipmap.ic_card_danmu, dip(15), ColorStateList.valueOf(config.white))
+                                        compoundDrawablePadding = dip(2)
+
                                         textSize = 12f
                                         setTextColor(config.white)
                                         _text = NumberUtil.converString(damukuNum ?: "0")
@@ -313,30 +277,17 @@ fun MiaoUI.videoItemV(
                             }
 
                             // UP主
-                            +horizontalLayout {
-                                gravity = Gravity.CENTER_VERTICAL
+                            +textView {
                                 _show = upperName != null
 
-                                views {
-                                    +imageView {
-                                        imageResource = R.mipmap.ic_card_up//R.drawable.icon_up
-                                        imageTintList =
-                                            ColorStateList.valueOf(config.foregroundAlpha45Color)
-                                        //apply(ViewStyle.roundRect(dip(5)))
-                                    }..lParams {
-                                        width = dip(16)
-                                        height = dip(16)
-                                        topMargin = dip(1)
-                                        rightMargin = dip(3)
-                                    }
+                                gravity = gravityCenterVertical
+                                setDrawableStart(R.mipmap.ic_card_up, dip(15), ColorStateList.valueOf(config.foregroundAlpha45Color))
+                                compoundDrawablePadding = dip(2)
 
-                                    +textView {
-                                        textSize = 12f
-                                        setTextColor(config.foregroundAlpha45Color)
-                                        maxLines = 1
-                                        _text = upperName ?: ""
-                                    }
-                                }
+                                textSize = 12f
+                                setTextColor(config.foregroundAlpha45Color)
+                                maxLines = 1
+                                _text = upperName ?: ""
                             }
 
                             // 备注

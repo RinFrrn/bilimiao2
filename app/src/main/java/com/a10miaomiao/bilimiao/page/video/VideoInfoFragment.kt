@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.*
@@ -25,6 +26,7 @@ import cn.a10miaomiao.miao.binding.android.widget._textColorResource
 import cn.a10miaomiao.miao.binding.miaoEffect
 import com.a10miaomiao.bilimiao.R
 import com.a10miaomiao.bilimiao.comm.*
+import com.a10miaomiao.bilimiao.comm.compat.setDrawableStart
 import com.a10miaomiao.bilimiao.comm.delegate.player.BasePlayerDelegate
 import com.a10miaomiao.bilimiao.comm.delegate.player.VideoPlayerSource
 import com.a10miaomiao.bilimiao.comm.entity.video.VideoPageInfo
@@ -632,7 +634,8 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                                 +textView {
                                     setTextColor(config.foregroundColor)
                                     textSize = 15f
-                                    _text = viewModel.info?.owner?.name ?: preLoadInfo?.ownerName ?: ""
+                                    _text =
+                                        viewModel.info?.owner?.name ?: preLoadInfo?.ownerName ?: ""
                                 }
 //                                +textView {
 //                                    leftPadding = dip(8)
@@ -765,32 +768,26 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
 
                                 // 播放量
                                 +horizontalLayout {
-                                    gravity = Gravity.CENTER_VERTICAL
 
                                     views {
 
-                                        +imageView {
-                                            imageTintList =
-                                                ColorStateList.valueOf(config.foregroundAlpha45Color)
-                                            setImageResource(R.mipmap.ic_card_play)
-                                        }..lParams(dip(14), dip(14))
                                         +textView {
+                                            setDrawableStart(R.mipmap.ic_card_play, dip(15), ColorStateList.valueOf(config.foregroundAlpha45Color))
+                                            compoundDrawablePadding = dip(2)
+
                                             lines = 1
                                             textSize = 12f
                                             setTextColor(config.foregroundAlpha45Color)
                                             _text =
                                                 NumberUtil.converString(videoInfo?.stat?.view ?: "")
                                         }..lParams {
-                                            leftMargin = dip(2)
                                             rightMargin = dip(12)
                                         }
 
-                                        +imageView {
-                                            imageTintList =
-                                                ColorStateList.valueOf(config.foregroundAlpha45Color)
-                                            setImageResource(R.mipmap.ic_card_danmu)
-                                        }..lParams(dip(14), dip(14))
                                         +textView {
+                                            setDrawableStart(R.mipmap.ic_card_danmu, dip(15), ColorStateList.valueOf(config.foregroundAlpha45Color))
+                                            compoundDrawablePadding = dip(2)
+
                                             lines = 1
                                             textSize = 12f
                                             setTextColor(config.foregroundAlpha45Color)
@@ -798,7 +795,6 @@ class VideoInfoFragment : Fragment(), DIAware, MyPage {
                                                 videoInfo?.stat?.danmaku ?: ""
                                             )
                                         }..lParams {
-                                            leftMargin = dip(2)
                                             rightMargin = dip(12)
                                         }
 

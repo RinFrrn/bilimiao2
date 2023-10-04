@@ -29,6 +29,7 @@ class CompletionBoxController(
      */
     private fun initCompletionBox() {
         hide()
+        completionLayout.setOnClickListener {  }  // 阻止因为没有隐藏播放器造成的点击穿透
         completionRetryBtn.setOnClickListener {
             hide()
             delegate.reloadPlayer()
@@ -42,7 +43,7 @@ class CompletionBoxController(
 
     fun show() {
         completionLayout.visibility = View.VISIBLE
-        delegate.views.videoPlayer.visibility = View.GONE
+//        delegate.views.videoPlayer.visibility = View.GONE
     }
     fun hide() {
         completionLayout.visibility = View.GONE
