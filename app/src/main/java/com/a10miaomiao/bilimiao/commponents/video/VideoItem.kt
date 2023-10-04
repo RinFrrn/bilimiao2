@@ -203,7 +203,7 @@ fun MiaoUI.videoItemV(
                             +glideRationImageView {
 //                                setImageUrl(pic)
                                 _network(pic, "@672w_378h_1c_")
-                                ration = 3f / 5f
+                                ration = 3f / 4f
                             }..lParams(matchParent, dip(0))
 
                             +textView {

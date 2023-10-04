@@ -183,7 +183,7 @@ class RecommendFragment : RecyclerViewFragment(), DIAware {
                 +recyclerviewAtViewPager2 {
                     backgroundColor = config.windowBackgroundColor
 
-                    val maxItemWidth = dip(200)
+                    val maxItemWidth = dip(175)
                     mLayoutManager = _miaoLayoutManage(
                         GridAutofitLayoutManager(requireContext(), maxItemWidth)
                     )

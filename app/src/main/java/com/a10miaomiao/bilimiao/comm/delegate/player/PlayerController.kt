@@ -470,6 +470,7 @@ class PlayerController(
             }
         }
         delegate.completionBoxController.show()
+        if (scaffoldApp.fullScreenPlayer) smallScreen()
     }
 
     override fun onVideoPause() {

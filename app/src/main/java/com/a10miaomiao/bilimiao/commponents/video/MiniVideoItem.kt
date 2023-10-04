@@ -55,7 +55,7 @@ private fun MiaoUI.miniVideoItemCover(
 
                 views {
                     +imageView {
-                        imageResource = R.drawable.ic_play_circle_outline_white_24dp
+                        imageResource = R.drawable.ic_play_circle_outline_black_24dp
                     }..lParams {
                         height = dip(15)
                         width = dip(20)
@@ -68,7 +68,7 @@ private fun MiaoUI.miniVideoItemCover(
                     }
                     +space()..lParams(width = dip(10))
                     +imageView {
-                        imageResource = R.drawable.ic_subtitles_white_24dp
+                        imageResource = R.drawable.ic_subtitles_black_24dp
                     }..lParams {
                         height = dip(15)
                         width = dip(20)
